@@ -1,923 +1,590 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>PLACAR MUNDIAL — Jogos, Tabelas e Estatísticas ao Vivo</title>
-  <meta name="description" content="PLACAR MUNDIAL: resultados ao vivo, jogos de hoje e amanhã, tabelas e campeonatos." />
-  <link rel="preconnect" href="https://fonts.googleapis.com" />
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
-  <style>
-    :root {
-      --bg:#070b14; --bg-card:#0f1624; --bg-elevated:#172033; --border:#243047;
-      --text:#eef3fb; --text-muted:#8b9bb8; --accent:#00e676; --accent-dim:#00c853;
-      --live:#ff3d00; --radius:16px; --shadow:0 10px 40px rgba(0,0,0,.4); --ticker-h:42px;
-    }
-    *{box-sizing:border-box;margin:0;padding:0}
-    html{scroll-behavior:smooth}
-    body{font-family:'Inter',system-ui,sans-serif;background:var(--bg);color:var(--text);min-height:100vh;line-height:1.5}
-    .ticker{position:sticky;top:0;z-index:200;height:var(--ticker-h);background:linear-gradient(90deg,#0a1a12,#0d1f18,#0a1a12);border-bottom:1px solid rgba(0,230,118,.25);overflow:hidden;display:flex;align-items:center}
-    .ticker-label{flex-shrink:0;background:var(--accent);color:#041208;font-weight:800;font-size:.7rem;letter-spacing:.06em;padding:0 14px;height:100%;display:flex;align-items:center;z-index:2}
-    .ticker-track-wrap{flex:1;overflow:hidden;height:100%}
-    .ticker-track{display:flex;align-items:center;height:100%;width:max-content;animation:ticker-scroll 55s linear infinite}
-    .ticker-track:hover{animation-play-state:paused}
-    @keyframes ticker-scroll{0%{transform:translateX(0)}100%{transform:translateX(-50%)}}
-    .ticker-item{display:inline-flex;align-items:center;gap:8px;padding:0 22px;font-size:.82rem;font-weight:600;white-space:nowrap;border-right:1px solid rgba(255,255,255,.08);height:100%}
-    .ticker-item .t-league{color:var(--text-muted);font-weight:500;font-size:.72rem;text-transform:uppercase;letter-spacing:.04em}
-    .ticker-item .t-score{font-weight:800;font-variant-numeric:tabular-nums;min-width:42px;text-align:center}
-    .ticker-item .t-score.live{color:var(--live)}
-    .ticker-item .t-live{background:rgba(255,61,0,.18);color:var(--live);font-size:.65rem;font-weight:800;padding:1px 6px;border-radius:4px}
-    .ticker-empty{color:var(--text-muted);font-size:.8rem;padding:0 16px}
-    header{position:sticky;top:var(--ticker-h);z-index:100;background:rgba(7,11,20,.92);backdrop-filter:blur(16px);border-bottom:1px solid var(--border);padding:14px 16px}
-    .header-inner{max-width:1200px;margin:0 auto;display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap}
-    .logo{display:flex;align-items:baseline;gap:8px;font-weight:800;font-size:1.4rem;letter-spacing:-.03em;line-height:1.1}
-    .logo .logo-placar{color:#fff}
-    .logo .logo-mundial{color:var(--accent)}
-    .status{display:flex;align-items:center;gap:8px;font-size:.8rem;color:var(--text-muted)}
-    .dot{width:8px;height:8px;border-radius:50%;background:var(--accent);box-shadow:0 0 10px var(--accent);animation:pulse 1.5s infinite}
-    @keyframes pulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.45;transform:scale(.85)}}
-    nav{max-width:1200px;margin:0 auto;padding:14px 16px 0;display:flex;gap:6px;overflow-x:auto;scrollbar-width:none}
-    nav::-webkit-scrollbar{display:none}
-    .nav-btn{flex-shrink:0;background:transparent;border:1px solid transparent;color:var(--text-muted);padding:10px 18px;border-radius:999px;font-weight:600;font-size:.9rem;cursor:pointer;transition:all .2s}
-    .nav-btn:hover{color:var(--text);background:var(--bg-elevated)}
-    .nav-btn.active{background:var(--accent);color:#041208;border-color:var(--accent);box-shadow:0 4px 18px rgba(0,230,118,.25)}
-    main{max-width:1200px;margin:0 auto;padding:22px 16px 90px}
-    .section{display:none;animation:fadeIn .3s ease}
-    .section.active{display:block}
-    @keyframes fadeIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
-    h2{font-size:1.4rem;font-weight:800;margin-bottom:18px;display:flex;align-items:center;gap:10px;flex-wrap:wrap;letter-spacing:-.02em}
-    h2 .badge{font-size:.72rem;background:var(--bg-elevated);color:var(--text-muted);padding:4px 12px;border-radius:999px;font-weight:600}
-    .filters{display:flex;flex-wrap:wrap;gap:10px;margin-bottom:20px;align-items:center}
-    select,.btn,input[type=text]{background:var(--bg-card);border:1px solid var(--border);color:var(--text);padding:11px 14px;border-radius:12px;font-size:.9rem;font-weight:500;outline:none;transition:border-color .2s,box-shadow .2s}
-    select:focus,.btn:hover,input:focus{border-color:var(--accent);box-shadow:0 0 0 3px rgba(0,230,118,.12)}
-    .btn{cursor:pointer}
-    .btn-primary{background:var(--accent);color:#041208;border-color:var(--accent);font-weight:700}
-    .btn-primary:hover{background:var(--accent-dim)}
-    .btn-outline{background:transparent}
-    .card{background:var(--bg-card);border:1px solid var(--border);border-radius:var(--radius);padding:18px;margin-bottom:14px;box-shadow:var(--shadow)}
-    .league-header{display:flex;align-items:center;gap:10px;margin-bottom:14px;padding-bottom:12px;border-bottom:1px solid var(--border);font-weight:700;font-size:.95rem}
-    .src-tag{font-size:.65rem;padding:3px 8px;border-radius:6px;font-weight:700;background:var(--bg-elevated);color:var(--text-muted);margin-left:auto}
-    .src-tag.fd{background:rgba(79,195,247,.15);color:#4fc3f7}
-    .src-tag.wc{background:rgba(0,230,118,.12);color:var(--accent)}
-    .src-tag.ol{background:rgba(255,193,7,.12);color:#ffc107}
-    .src-tag.af{background:rgba(233,30,99,.15);color:#f48fb1}
-    .match{display:grid;grid-template-columns:1fr auto 1fr;gap:12px;align-items:center;padding:14px 0;border-bottom:1px solid rgba(36,48,71,.55)}
-    .match:last-child{border-bottom:none}
-    .team{display:flex;align-items:center;gap:10px;min-width:0}
-    .team.home{justify-content:flex-end;text-align:right}
-    .team.away{justify-content:flex-start}
-    .team-name{font-weight:600;font-size:.95rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-    .team img,.crest{width:32px;height:32px;object-fit:contain;flex-shrink:0;border-radius:6px;background:rgba(255,255,255,.04)}
-    .score-box{display:flex;flex-direction:column;align-items:center;gap:4px;min-width:80px}
-    .score{font-size:1.5rem;font-weight:800;letter-spacing:.04em;font-variant-numeric:tabular-nums}
-    .score.live{color:var(--live);text-shadow:0 0 20px rgba(255,61,0,.35)}
-    .status-badge{font-size:.68rem;font-weight:700;padding:3px 8px;border-radius:6px;text-transform:uppercase}
-    .status-badge.live{background:rgba(255,61,0,.15);color:var(--live)}
-    .status-badge.ft{background:rgba(0,230,118,.12);color:var(--accent)}
-    .status-badge.ns{background:var(--bg-elevated);color:var(--text-muted)}
-    .table-wrap{overflow-x:auto;border-radius:var(--radius);border:1px solid var(--border)}
-    table{width:100%;border-collapse:collapse;font-size:.9rem}
-    th{background:var(--bg-elevated);text-align:left;padding:13px 12px;font-weight:600;color:var(--text-muted);white-space:nowrap}
-    td{padding:12px;border-top:1px solid var(--border);white-space:nowrap}
-    tr:hover td{background:rgba(255,255,255,.025)}
-    .pos{font-weight:700;width:40px;text-align:center}
-    .pos.top{color:var(--accent)}
-    .pos.bottom{color:var(--live)}
-    .team-cell{display:flex;align-items:center;gap:10px;font-weight:600}
-    .team-cell img{width:26px;height:26px;object-fit:contain;border-radius:4px}
-    .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:14px}
-    .league-card{background:var(--bg-card);border:1px solid var(--border);border-radius:var(--radius);padding:20px;cursor:pointer;transition:all .22s}
-    .league-card:hover{border-color:var(--accent);transform:translateY(-3px);box-shadow:0 12px 32px rgba(0,230,118,.1)}
-    .league-card h3{font-size:1.05rem;margin-bottom:4px}
-    .league-card p{color:var(--text-muted);font-size:.85rem}
-    .loading{text-align:center;padding:52px 20px;color:var(--text-muted)}
-    .spinner{width:42px;height:42px;border:3px solid var(--border);border-top-color:var(--accent);border-radius:50%;margin:0 auto 16px;animation:spin .75s linear infinite}
-    @keyframes spin{to{transform:rotate(360deg)}}
-    .empty{text-align:center;padding:44px 20px;color:var(--text-muted);background:var(--bg-card);border-radius:var(--radius);border:1px dashed var(--border)}
-    .stats-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:12px;margin-bottom:24px}
-    .stat-card{background:var(--bg-card);border:1px solid var(--border);border-radius:var(--radius);padding:18px;text-align:center}
-    .stat-value{font-size:1.85rem;font-weight:800;color:var(--accent);line-height:1.1}
-    .stat-label{font-size:.8rem;color:var(--text-muted);margin-top:6px}
-    .settings-box{background:var(--bg-card);border:1px solid var(--border);border-radius:var(--radius);padding:22px;margin-bottom:16px}
-    .settings-box label{display:block;font-weight:600;margin-bottom:8px;font-size:.9rem}
-    .settings-box input{width:100%;max-width:440px;margin-bottom:10px}
-    .settings-box .hint{font-size:.8rem;color:var(--text-muted);margin-top:8px;line-height:1.55}
-    .settings-box a{color:var(--accent)}
-    .key-status{display:inline-flex;align-items:center;gap:6px;font-size:.85rem;margin-top:8px}
-    .key-status.ok{color:var(--accent)}
-    .key-status.err{color:var(--live)}
-    footer{text-align:center;padding:28px 16px;color:var(--text-muted);font-size:.8rem;border-top:1px solid var(--border)}
-    footer .logo-placar{color:#fff;font-weight:800}
-    footer .logo-mundial{color:var(--accent);font-weight:800}
-    @media(max-width:600px){
-      .logo{font-size:1.15rem}
-      .team-name{font-size:.85rem}
-      .score{font-size:1.25rem}
-      .match{gap:8px}
-      .team img,.crest{width:26px;height:26px}
-      .ticker-item{font-size:.75rem;padding:0 14px}
-    }
-  </style>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+<title>PLACAR MUNDIAL — Ao Vivo</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet"/>
+<style>
+:root{--bg:#070b14;--card:#0f1624;--elev:#172033;--border:#243047;--text:#eef3fb;--muted:#8b9bb8;--accent:#00e676;--accent2:#00c853;--live:#ff3d00;--r:16px;--ticker:42px}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:Inter,system-ui,sans-serif;background:var(--bg);color:var(--text);min-height:100vh;line-height:1.5}
+.ticker{position:sticky;top:0;z-index:200;height:var(--ticker);background:linear-gradient(90deg,#0a1a12,#0d1f18,#0a1a12);border-bottom:1px solid rgba(0,230,118,.25);display:flex;align-items:center;overflow:hidden}
+.ticker-label{flex-shrink:0;background:var(--accent);color:#041208;font-weight:800;font-size:.7rem;letter-spacing:.06em;padding:0 14px;height:100%;display:flex;align-items:center}
+.ticker-wrap{flex:1;overflow:hidden;height:100%}
+.ticker-track{display:flex;align-items:center;height:100%;width:max-content;animation:tick 55s linear infinite}
+.ticker-track:hover{animation-play-state:paused}
+@keyframes tick{to{transform:translateX(-50%)}}
+.t-item{display:inline-flex;align-items:center;gap:8px;padding:0 20px;font-size:.8rem;font-weight:600;white-space:nowrap;border-right:1px solid rgba(255,255,255,.08);height:100%}
+.t-item .lg{color:var(--muted);font-size:.7rem;text-transform:uppercase}
+.t-item .sc{font-weight:800;min-width:40px;text-align:center;font-variant-numeric:tabular-nums}
+.t-item .sc.live{color:var(--live)}
+.t-item .lv{background:rgba(255,61,0,.18);color:var(--live);font-size:.62rem;font-weight:800;padding:1px 6px;border-radius:4px}
+.t-empty{color:var(--muted);font-size:.8rem;padding:0 16px}
+header{position:sticky;top:var(--ticker);z-index:100;background:rgba(7,11,20,.92);backdrop-filter:blur(16px);border-bottom:1px solid var(--border);padding:14px 16px}
+.hi{max-width:1200px;margin:0 auto;display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap}
+.logo{display:flex;gap:8px;font-weight:800;font-size:1.35rem;letter-spacing:-.03em}
+.logo .p{color:#fff}.logo .m{color:var(--accent)}
+.status{display:flex;align-items:center;gap:8px;font-size:.8rem;color:var(--muted)}
+.dot{width:8px;height:8px;border-radius:50%;background:var(--accent);box-shadow:0 0 10px var(--accent);animation:pulse 1.5s infinite}
+@keyframes pulse{50%{opacity:.4;transform:scale(.85)}}
+nav{max-width:1200px;margin:0 auto;padding:14px 16px 0;display:flex;gap:6px;overflow-x:auto;scrollbar-width:none}
+nav::-webkit-scrollbar{display:none}
+.nav-btn{flex-shrink:0;background:transparent;border:1px solid transparent;color:var(--muted);padding:10px 16px;border-radius:999px;font-weight:600;font-size:.88rem;cursor:pointer;transition:.2s}
+.nav-btn:hover{color:var(--text);background:var(--elev)}
+.nav-btn.active{background:var(--accent);color:#041208;box-shadow:0 4px 18px rgba(0,230,118,.25)}
+main{max-width:1200px;margin:0 auto;padding:20px 16px 90px}
+.section{display:none;animation:fi .3s ease}.section.active{display:block}
+@keyframes fi{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+h2{font-size:1.3rem;font-weight:800;margin-bottom:16px;display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+.badge{font-size:.7rem;background:var(--elev);color:var(--muted);padding:3px 10px;border-radius:999px;font-weight:600}
+.filters{display:flex;flex-wrap:wrap;gap:10px;margin-bottom:18px}
+select,.btn,input[type=text]{background:var(--card);border:1px solid var(--border);color:var(--text);padding:10px 14px;border-radius:12px;font-size:.88rem;font-weight:500;outline:none}
+select:focus,.btn:hover,input:focus{border-color:var(--accent)}
+.btn{cursor:pointer}.btn-primary{background:var(--accent);color:#041208;border-color:var(--accent);font-weight:700}
+.btn-outline{background:transparent}
+.card{background:var(--card);border:1px solid var(--border);border-radius:var(--r);padding:16px;margin-bottom:12px;box-shadow:0 8px 32px rgba(0,0,0,.35)}
+.lh{display:flex;align-items:center;gap:10px;margin-bottom:12px;padding-bottom:10px;border-bottom:1px solid var(--border);font-weight:700;font-size:.92rem}
+.tag{font-size:.62rem;padding:2px 7px;border-radius:6px;font-weight:700;margin-left:auto;background:var(--elev);color:var(--muted)}
+.tag.fd{background:rgba(79,195,247,.15);color:#4fc3f7}
+.tag.wc{background:rgba(0,230,118,.12);color:var(--accent)}
+.tag.ol{background:rgba(255,193,7,.12);color:#ffc107}
+.tag.af{background:rgba(233,30,99,.15);color:#f48fb1}
+.match{display:grid;grid-template-columns:1fr auto 1fr;gap:10px;align-items:center;padding:12px 0;border-bottom:1px solid rgba(36,48,71,.5);cursor:pointer;border-radius:8px;transition:background .15s}
+.match:hover{background:rgba(255,255,255,.03)}
+.match:last-child{border-bottom:none}
+.team{display:flex;align-items:center;gap:8px;min-width:0}
+.team.home{justify-content:flex-end;text-align:right}
+.tn{font-weight:600;font-size:.9rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.team img{width:28px;height:28px;object-fit:contain;border-radius:5px;background:rgba(255,255,255,.04)}
+.sb{display:flex;flex-direction:column;align-items:center;gap:3px;min-width:72px}
+.sc{font-size:1.35rem;font-weight:800;font-variant-numeric:tabular-nums}
+.sc.live{color:var(--live)}
+.st{font-size:.65rem;font-weight:700;padding:2px 7px;border-radius:6px;text-transform:uppercase}
+.st.live{background:rgba(255,61,0,.15);color:var(--live)}
+.st.ft{background:rgba(0,230,118,.12);color:var(--accent)}
+.st.ns{background:var(--elev);color:var(--muted)}
+.table-wrap{overflow-x:auto;border-radius:var(--r);border:1px solid var(--border);margin-bottom:8px}
+table{width:100%;border-collapse:collapse;font-size:.88rem}
+th{background:var(--elev);text-align:left;padding:11px 10px;font-weight:600;color:var(--muted);white-space:nowrap}
+td{padding:10px;border-top:1px solid var(--border);white-space:nowrap}
+tr:hover td{background:rgba(255,255,255,.02)}
+.pos{font-weight:700;width:36px;text-align:center}.pos.top{color:var(--accent)}.pos.bottom{color:var(--live)}
+.tc{display:flex;align-items:center;gap:8px;font-weight:600}
+.tc img{width:22px;height:22px;object-fit:contain}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:12px}
+.lc{background:var(--card);border:1px solid var(--border);border-radius:var(--r);padding:16px;cursor:pointer;transition:.2s}
+.lc:hover{border-color:var(--accent);transform:translateY(-2px)}
+.loading,.empty{text-align:center;padding:40px 16px;color:var(--muted)}
+.empty{background:var(--card);border-radius:var(--r);border:1px dashed var(--border)}
+.spinner{width:36px;height:36px;border:3px solid var(--border);border-top-color:var(--accent);border-radius:50%;margin:0 auto 12px;animation:spin .7s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+.stats-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(130px,1fr));gap:10px;margin-bottom:20px}
+.stat-card{background:var(--card);border:1px solid var(--border);border-radius:var(--r);padding:14px;text-align:center}
+.stat-value{font-size:1.6rem;font-weight:800;color:var(--accent)}
+.stat-label{font-size:.75rem;color:var(--muted);margin-top:4px}
+.settings-box{background:var(--card);border:1px solid var(--border);border-radius:var(--r);padding:18px;margin-bottom:14px}
+.settings-box label{display:block;font-weight:600;margin-bottom:6px;font-size:.88rem}
+.settings-box input{width:100%;max-width:400px;margin-bottom:8px}
+.hint{font-size:.78rem;color:var(--muted);margin-top:6px;line-height:1.5}
+.hint a{color:var(--accent)}
+.key-status{font-size:.82rem;margin-top:6px}.key-status.ok{color:var(--accent)}.key-status.err{color:var(--live)}
+footer{text-align:center;padding:24px 16px;color:var(--muted);font-size:.78rem;border-top:1px solid var(--border)}
+/* Modal */
+.modal-bg{position:fixed;inset:0;background:rgba(0,0,0,.7);z-index:300;display:none;align-items:flex-end;justify-content:center;padding:12px;backdrop-filter:blur(4px)}
+.modal-bg.open{display:flex}
+.modal{background:var(--card);border:1px solid var(--border);border-radius:20px 20px 12px 12px;width:100%;max-width:560px;max-height:88vh;overflow:auto;padding:20px;animation:up .25s ease}
+@keyframes up{from{transform:translateY(40px);opacity:0}to{transform:none;opacity:1}}
+.modal h3{font-size:1.1rem;margin-bottom:4px}
+.modal .sub{color:var(--muted);font-size:.82rem;margin-bottom:14px}
+.modal .close{float:right;background:var(--elev);border:none;color:var(--text);width:32px;height:32px;border-radius:50%;cursor:pointer;font-size:1.1rem}
+.modal .scoreline{display:flex;align-items:center;justify-content:center;gap:16px;margin:16px 0;font-size:1.8rem;font-weight:800}
+.modal .scoreline img{width:40px;height:40px;object-fit:contain}
+.ev-list{list-style:none;margin:12px 0}
+.ev-list li{padding:8px 0;border-bottom:1px solid var(--border);font-size:.85rem;display:flex;gap:10px}
+.ev-list .min{color:var(--accent);font-weight:700;min-width:36px}
+.stand-block{margin-bottom:20px}
+.stand-block h3{font-size:1rem;margin-bottom:8px;display:flex;align-items:center;gap:8px}
+@media(max-width:600px){.tn{font-size:.8rem}.sc{font-size:1.15rem}.match{gap:6px}}
+</style>
 </head>
 <body>
-  <div class="ticker"><div class="ticker-label">AO VIVO</div>
-    <div class="ticker-track-wrap"><div class="ticker-track" id="tickerTrack">
-      <span class="ticker-empty">Carregando resultados...</span>
-    </div></div>
-  </div>
-  <header><div class="header-inner">
-    <div class="logo"><span class="logo-placar">PLACAR</span><span class="logo-mundial">MUNDIAL</span></div>
-    <div class="status"><span class="dot"></span><span id="lastUpdate">Atualizando...</span></div>
-  </div></header>
-  <nav id="nav">
-    <button class="nav-btn active" data-section="hoje">Hoje</button>
-    <button class="nav-btn" data-section="amanha">Amanhã</button>
-    <button class="nav-btn" data-section="tabelas">Tabelas</button>
-    <button class="nav-btn" data-section="campeonatos">Campeonatos</button>
-    <button class="nav-btn" data-section="historico">Histórico</button>
-    <button class="nav-btn" data-section="stats">Estatísticas</button>
-    <button class="nav-btn" data-section="config">Config</button>
-  </nav>
-  <main>
-    <section id="hoje" class="section active">
-      <h2>Jogos de Hoje <span class="badge" id="hojeBadge">—</span></h2>
-      <div class="filters">
-        <select id="hojeLeague"><option value="all">Todos os campeonatos</option></select>
-        <button class="btn btn-primary" onclick="loadToday()">Atualizar</button>
+<div class="ticker"><div class="ticker-label">AO VIVO</div><div class="ticker-wrap"><div class="ticker-track" id="tickerTrack"><span class="t-empty">Carregando...</span></div></div></div>
+<header><div class="hi">
+  <div class="logo"><span class="p">PLACAR</span><span class="m">MUNDIAL</span></div>
+  <div class="status"><span class="dot"></span><span id="lastUpdate">—</span></div>
+</div></header>
+<nav id="nav">
+  <button class="nav-btn active" data-section="hoje">Hoje</button>
+  <button class="nav-btn" data-section="amanha">Amanhã</button>
+  <button class="nav-btn" data-section="tabelas">Tabelas</button>
+  <button class="nav-btn" data-section="campeonatos">Campeonatos</button>
+  <button class="nav-btn" data-section="historico">Histórico</button>
+  <button class="nav-btn" data-section="stats">Estatísticas</button>
+  <button class="nav-btn" data-section="config">Config</button>
+</nav>
+<main>
+  <section id="hoje" class="section active">
+    <h2>Jogos de Hoje <span class="badge" id="hojeBadge">—</span></h2>
+    <div class="filters">
+      <select id="hojeLeague"><option value="all">Todos</option></select>
+      <button class="btn btn-primary" onclick="loadToday()">Atualizar</button>
+    </div>
+    <div id="hojeContent" class="loading"><div class="spinner"></div>Carregando...</div>
+  </section>
+  <section id="amanha" class="section">
+    <h2>Jogos de Amanhã <span class="badge" id="amanhaBadge">—</span></h2>
+    <div class="filters">
+      <select id="amanhaLeague"><option value="all">Todos</option></select>
+      <button class="btn btn-primary" onclick="loadTomorrow()">Atualizar</button>
+    </div>
+    <div id="amanhaContent" class="loading"><div class="spinner"></div>Carregando...</div>
+  </section>
+  <section id="tabelas" class="section">
+    <h2>Tabelas <span class="badge" id="tabelasBadge">todas</span></h2>
+    <div id="tabelaContent" class="loading"><div class="spinner"></div>Carregando todas as tabelas...</div>
+  </section>
+  <section id="campeonatos" class="section">
+    <h2>Campeonatos <span class="badge" id="campeonatosBadge">—</span></h2>
+    <div id="campeonatosContent" class="loading"><div class="spinner"></div>Carregando...</div>
+  </section>
+  <section id="historico" class="section">
+    <h2>Histórico Recente <span class="badge">automático</span></h2>
+    <div id="histContent" class="loading"><div class="spinner"></div>Carregando resultados...</div>
+  </section>
+  <section id="stats" class="section">
+    <h2>Estatísticas</h2>
+    <div id="statsContent" class="loading"><div class="spinner"></div>Carregando...</div>
+  </section>
+  <section id="config" class="section">
+    <h2>Configurações</h2>
+    <div class="settings-box">
+      <label>Chave football-data.org</label>
+      <input type="text" id="fdKey" autocomplete="off"/>
+      <div style="display:flex;gap:8px;flex-wrap:wrap">
+        <button class="btn btn-primary" onclick="saveFdKey()">Salvar</button>
+        <button class="btn btn-outline" onclick="clearFdKey()">Remover</button>
+        <button class="btn btn-outline" onclick="testFdKey()">Testar</button>
       </div>
-      <div id="hojeContent" class="loading"><div class="spinner"></div>Carregando jogos de hoje...</div>
-    </section>
-    <section id="amanha" class="section">
-      <h2>Jogos de Amanhã <span class="badge" id="amanhaBadge">—</span></h2>
-      <div class="filters">
-        <select id="amanhaLeague"><option value="all">Todos os campeonatos</option></select>
-        <button class="btn btn-primary" onclick="loadTomorrow()">Atualizar</button>
+      <div id="keyStatus" class="key-status"></div>
+      <p class="hint"><a href="https://www.football-data.org/client/register" target="_blank">Cadastro gratuito</a></p>
+    </div>
+    <div class="settings-box">
+      <label>Chave API-Football (Ásia + América do Sul extra)</label>
+      <input type="text" id="afKey" autocomplete="off"/>
+      <div style="display:flex;gap:8px;flex-wrap:wrap">
+        <button class="btn btn-primary" onclick="saveAfKey()">Salvar</button>
+        <button class="btn btn-outline" onclick="clearAfKey()">Remover</button>
+        <button class="btn btn-outline" onclick="testAfKey()">Testar</button>
       </div>
-      <div id="amanhaContent" class="loading"><div class="spinner"></div>Carregando jogos de amanhã...</div>
-    </section>
-    <section id="tabelas" class="section">
-      <h2>Tabelas / Classificações <span class="badge">Ao vivo</span></h2>
-      <div class="filters">
-        <select id="tabelaLeague"></select>
-        <button class="btn btn-primary" onclick="loadStandings()">Carregar tabela</button>
-      </div>
-      <div id="tabelaContent" class="empty">Selecione um campeonato.</div>
-    </section>
-    <section id="campeonatos" class="section">
-      <h2>Campeonatos <span class="badge" id="campeonatosBadge">—</span></h2>
-      <div id="campeonatosContent" class="loading"><div class="spinner"></div>Carregando...</div>
-    </section>
-    <section id="historico" class="section">
-      <h2>Histórico / Resultados Recentes</h2>
-      <div class="filters">
-        <select id="histLeague"></select>
-        <button class="btn btn-primary" onclick="loadHistory()">Buscar resultados</button>
-      </div>
-      <div id="histContent" class="empty">Selecione um campeonato.</div>
-    </section>
-    <section id="stats" class="section">
-      <h2>Estatísticas Gerais</h2>
-      <div id="statsContent" class="loading"><div class="spinner"></div>Carregando...</div>
-    </section>
-    <section id="config" class="section">
-      <h2>Configurações das APIs</h2>
-      <div class="settings-box">
-        <label for="fdKey">Chave football-data.org (Europa + Brasil)</label>
-        <input type="text" id="fdKey" placeholder="Chave FD" autocomplete="off" />
-        <div style="display:flex;gap:10px;flex-wrap:wrap">
-          <button class="btn btn-primary" onclick="saveFdKey()">Salvar</button>
-          <button class="btn btn-outline" onclick="clearFdKey()">Remover</button>
-          <button class="btn btn-outline" onclick="testFdKey()">Testar</button>
-        </div>
-        <div id="keyStatus" class="key-status"></div>
-        <p class="hint">Cadastro: <a href="https://www.football-data.org/client/register" target="_blank" rel="noopener">football-data.org</a></p>
-      </div>
-      <div class="settings-box">
-        <label for="afKey">Chave API-Football (ligas asiáticas)</label>
-        <input type="text" id="afKey" placeholder="x-apisports-key" autocomplete="off" />
-        <div style="display:flex;gap:10px;flex-wrap:wrap">
-          <button class="btn btn-primary" onclick="saveAfKey()">Salvar</button>
-          <button class="btn btn-outline" onclick="clearAfKey()">Remover</button>
-          <button class="btn btn-outline" onclick="testAfKey()">Testar</button>
-        </div>
-        <div id="afKeyStatus" class="key-status"></div>
-        <p class="hint">Gratuito em <a href="https://www.api-football.com/" target="_blank" rel="noopener">api-football.com</a> — J1, K League, CSL, Saudi, A-League, AFC</p>
-      </div>
-    </section>
-  </main>
-  <footer>
-    <span class="logo-placar">PLACAR</span> <span class="logo-mundial">MUNDIAL</span>
-    · football-data.org · Free API · OpenLigaDB · API-Football · Auto 45s
-  </footer>
+      <div id="afKeyStatus" class="key-status"></div>
+      <p class="hint">Com chave válida: Brasil, Argentina, Colômbia, México, J1, K League, CSL, Saudi, AFC… <a href="https://www.api-football.com/" target="_blank">api-football.com</a></p>
+    </div>
+  </section>
+</main>
+<footer><span class="logo"><span class="p">PLACAR</span> <span class="m">MUNDIAL</span></span> · Auto 45s · Clique no jogo para estatísticas</footer>
+
+<div class="modal-bg" id="modalBg" onclick="if(event.target===this)closeModal()">
+  <div class="modal" id="modalBox"><button class="close" onclick="closeModal()">×</button><div id="modalBody">Carregando...</div></div>
+</div>
 
 <script>
+const WC='https://worldcup26.ir/get/soccer', FD='https://api.football-data.org/v4', OL='https://api.openligadb.de', AF='https://v3.football.api-sports.io';
+const FD_COMPS=[
+  {code:'PL',name:'Premier League',country:'England'},
+  {code:'PD',name:'La Liga',country:'Spain'},
+  {code:'BL1',name:'Bundesliga',country:'Germany'},
+  {code:'SA',name:'Serie A',country:'Italy'},
+  {code:'FL1',name:'Ligue 1',country:'France'},
+  {code:'CL',name:'UEFA Champions League',country:'Europe'},
+  {code:'DED',name:'Eredivisie',country:'Netherlands'},
+  {code:'PPL',name:'Primeira Liga',country:'Portugal'},
+  {code:'ELC',name:'Championship',country:'England'},
+  {code:'BSA',name:'Brasileirão Série A',country:'Brazil'},
+  {code:'WC',name:'FIFA World Cup',country:'World'},
+  {code:'EC',name:'Euro',country:'Europe'},
+];
+const OL_COMPS=[
+  {shortcut:'bl2',season:2026,name:'2. Bundesliga',country:'Germany'},
+  {shortcut:'bl3',season:2026,name:'3. Liga',country:'Germany'},
+  {shortcut:'dfb',season:2026,name:'DFB-Pokal',country:'Germany'},
+];
+// América do Sul + Ásia via API-Football (precisa chave válida)
+const AF_COMPS=[
+  {id:71,name:'Brasileirão Série A',country:'Brazil',season:2026},
+  {id:72,name:'Brasileirão Série B',country:'Brazil',season:2026},
+  {id:128,name:'Liga Profesional',country:'Argentina',season:2026},
+  {id:13,name:'Libertadores',country:'South America',season:2026},
+  {id:11,name:'Sudamericana',country:'South America',season:2026},
+  {id:239,name:'Primera A',country:'Colombia',season:2026},
+  {id:265,name:'Primera División',country:'Chile',season:2026},
+  {id:281,name:'Primera División',country:'Peru',season:2026},
+  {id:268,name:'Primera División',country:'Uruguay',season:2026},
+  {id:262,name:'Liga MX',country:'Mexico',season:2026},
+  {id:98,name:'J1 League',country:'Japan',season:2026},
+  {id:292,name:'K League 1',country:'South Korea',season:2026},
+  {id:169,name:'Chinese Super League',country:'China',season:2026},
+  {id:307,name:'Saudi Pro League',country:'Saudi Arabia',season:2026},
+  {id:188,name:'A-League',country:'Australia',season:2026},
+  {id:17,name:'AFC Champions League Elite',country:'Asia',season:2026},
+];
+let leagues=[], timer=null, matchIndex={};
+const DEF_FD='28a0d62e9b3c44e5a0d9d75e628abda3';
+function getFd(){return localStorage.getItem('fd_api_key')||DEF_FD}
+function getAf(){return localStorage.getItem('af_api_key')||''}
+function pad(n){return String(n).padStart(2,'0')}
+function localISO(d){return d.getFullYear()+'-'+pad(d.getMonth()+1)+'-'+pad(d.getDate())}
+function todayISO(){return localISO(new Date())}
+function tomorrowISO(){const d=new Date();d.setDate(d.getDate()+1);return localISO(d)}
+function compact(iso){return iso.replace(/-/g,'')}
+function fmtTime(iso){if(!iso)return'—';return new Date(iso).toLocaleTimeString('pt-BR',{hour:'2-digit',minute:'2-digit'})}
+function stamp(){const n=new Date();document.getElementById('lastUpdate').textContent='Atualizado '+n.toLocaleTimeString('pt-BR',{hour:'2-digit',minute:'2-digit',second:'2-digit'})}
 
-    const WC_API = 'https://worldcup26.ir/get/soccer';
-    const FD_API = 'https://api.football-data.org/v4';
-    const OL_API = 'https://api.openligadb.de';
-    const AF_API = 'https://v3.football.api-sports.io';
+document.getElementById('nav').onclick=e=>{
+  const b=e.target.closest('.nav-btn');if(!b)return;
+  document.querySelectorAll('.nav-btn').forEach(x=>x.classList.remove('active'));
+  document.querySelectorAll('.section').forEach(x=>x.classList.remove('active'));
+  b.classList.add('active');document.getElementById(b.dataset.section).classList.add('active');
+  if(b.dataset.section==='config'){
+    document.getElementById('fdKey').value=getFd();
+    document.getElementById('afKey').value=getAf();
+    setKS(localStorage.getItem('fd_api_key')?'Chave FD do navegador.':'Chave FD padrão.',true);
+    setAKS(getAf()?'Chave AF ativa.':'Sem chave AF — SA/Ásia extras desativadas.',!!getAf());
+  }
+  if(b.dataset.section==='tabelas') loadAllStandings();
+  if(b.dataset.section==='historico') loadAllHistory();
+};
 
-    const FD_COMPS = [
-      { code: 'PL',  name: 'Premier League', country: 'England', type: 'league' },
-      { code: 'PD',  name: 'La Liga', country: 'Spain', type: 'league' },
-      { code: 'BL1', name: 'Bundesliga', country: 'Germany', type: 'league' },
-      { code: 'SA',  name: 'Serie A', country: 'Italy', type: 'league' },
-      { code: 'FL1', name: 'Ligue 1', country: 'France', type: 'league' },
-      { code: 'CL',  name: 'UEFA Champions League', country: 'Europe', type: 'cup' },
-      { code: 'DED', name: 'Eredivisie', country: 'Netherlands', type: 'league' },
-      { code: 'PPL', name: 'Primeira Liga', country: 'Portugal', type: 'league' },
-      { code: 'ELC', name: 'Championship', country: 'England', type: 'league' },
-      { code: 'BSA', name: 'Campeonato Brasileiro Série A', country: 'Brazil', type: 'league' },
-      { code: 'WC',  name: 'FIFA World Cup', country: 'World', type: 'cup' },
-      { code: 'EC',  name: 'UEFA European Championship', country: 'Europe', type: 'cup' },
-    ];
+function setKS(m,ok){const el=document.getElementById('keyStatus');el.textContent=m;el.className='key-status '+(ok?'ok':'err')}
+function setAKS(m,ok){const el=document.getElementById('afKeyStatus');el.textContent=m;el.className='key-status '+(ok?'ok':'err')}
+function saveFdKey(){const k=document.getElementById('fdKey').value.trim();if(!k)return setKS('Informe a chave.',false);localStorage.setItem('fd_api_key',k);setKS('Salva!',true);init()}
+function clearFdKey(){localStorage.removeItem('fd_api_key');document.getElementById('fdKey').value=DEF_FD;setKS('Padrão.',true);init()}
+async function testFdKey(){setKS('Testando...',true);try{await fetchFD('/competitions/PL');setKS('FD OK!',true)}catch(e){setKS(e.message,false)}}
+function saveAfKey(){const k=document.getElementById('afKey').value.trim();if(!k)return setAKS('Informe a chave.',false);localStorage.setItem('af_api_key',k);setAKS('Salva! SA/Ásia ativas.',true);init()}
+function clearAfKey(){localStorage.removeItem('af_api_key');document.getElementById('afKey').value='';setAKS('Removida.',false);init()}
+async function testAfKey(){const k=document.getElementById('afKey').value.trim()||getAf();if(!k)return setAKS('Sem chave.',false);setAKS('Testando...',true);try{const r=await fetch(AF+'/status',{headers:{'x-apisports-key':k}});const d=await r.json();if(r.ok&&d.response){setAKS('OK: '+(d.response.subscription?.plan||'free'),true);localStorage.setItem('af_api_key',k)}else setAKS('Inválida.',false)}catch(e){setAKS(e.message,false)}}
 
-    const OL_COMPS = [
-      { shortcut: 'bl2', season: 2026, name: '2. Bundesliga', country: 'Germany', type: 'league' },
-      { shortcut: 'bl3', season: 2026, name: '3. Liga', country: 'Germany', type: 'league' },
-      { shortcut: 'dfb', season: 2026, name: 'DFB-Pokal', country: 'Germany', type: 'cup' },
-    ];
+async function fetchWC(p){const r=await fetch(WC+p);if(!r.ok)throw new Error('WC '+r.status);return r.json()}
+async function fetchFD(p){
+  const url=FD+p, h={'X-Auth-Token':getFd()};
+  try{const r=await fetch(url,{headers:h});if(r.ok)return r.json();if([401,403,404].includes(r.status))throw new Error('FD '+r.status)}catch(e){if(String(e.message).includes('FD '))throw e}
+  const r2=await fetch('https://proxy.cors.sh/'+url,{headers:{...h,'x-requested-with':'XMLHttpRequest'}});
+  if(!r2.ok)throw new Error('FD '+r2.status);return r2.json();
+}
+async function fetchOL(p){const r=await fetch(OL+p);if(!r.ok)throw new Error('OL '+r.status);return r.json()}
+async function fetchAF(p){const k=getAf();if(!k)throw new Error('Sem AF');const r=await fetch(AF+p,{headers:{'x-apisports-key':k}});if(!r.ok)throw new Error('AF '+r.status);return r.json()}
+function extractWC(d){let e=d.events||[];if(!e.length&&d.leagues)e=d.leagues.flatMap(l=>l.events||[]);return e}
 
-    // Ligas asiáticas + Oceania via API-Football (IDs estáveis)
-    const AF_ASIA_COMPS = [
-      { id: 98,  name: 'J1 League', country: 'Japan', type: 'league', season: 2026 },
-      { id: 99,  name: 'J2 League', country: 'Japan', type: 'league', season: 2026 },
-      { id: 292, name: 'K League 1', country: 'South Korea', type: 'league', season: 2026 },
-      { id: 293, name: 'K League 2', country: 'South Korea', type: 'league', season: 2026 },
-      { id: 169, name: 'Chinese Super League', country: 'China', type: 'league', season: 2026 },
-      { id: 307, name: 'Saudi Pro League', country: 'Saudi Arabia', type: 'league', season: 2026 },
-      { id: 188, name: 'A-League Men', country: 'Australia', type: 'league', season: 2026 },
-      { id: 17,  name: 'AFC Champions League Elite', country: 'Asia', type: 'cup', season: 2026 },
-      { id: 18,  name: 'AFC Champions League Two', country: 'Asia', type: 'cup', season: 2026 },
-      { id: 296, name: 'Thai League 1', country: 'Thailand', type: 'league', season: 2026 },
-      { id: 274, name: 'Indian Super League', country: 'India', type: 'league', season: 2026 },
-    ];
+function nFD(m){
+  const s=(m.status||'').toUpperCase();
+  return{id:'fd_'+m.id,source:'fd',fdId:m.id,homeName:m.homeTeam?.shortName||m.homeTeam?.name||'Casa',awayName:m.awayTeam?.shortName||m.awayTeam?.name||'Fora',
+    homeLogo:m.homeTeam?.crest,awayLogo:m.awayTeam?.crest,
+    homeScore:m.score?.fullTime?.home??null,awayScore:m.score?.fullTime?.away??null,
+    isLive:['IN_PLAY','PAUSED','EXTRA_TIME','PENALTY_SHOOTOUT'].includes(s),isFT:s==='FINISHED'||s==='AWARDED',
+    date:m.utcDate,timeLabel:fmtTime(m.utcDate),minute:m.minute||'',comp:m.competition?.name||''};
+}
+function nWC(ev,slug){
+  const c=ev.competitions?.[0]||{},h=c.competitors?.find(x=>x.homeAway==='home')||{},a=c.competitors?.find(x=>x.homeAway==='away')||{};
+  const st=ev.status||c.status||{}, raw=(st.type?.name||st.type?.state||'').toString().toLowerCase();
+  let hs=h.score,as=a.score;if(hs==='—'||hs==='')hs=null;if(as==='—'||as==='')as=null;
+  if(hs!=null&&!isNaN(+hs))hs=+hs;if(as!=null&&!isNaN(+as))as=+as;
+  return{id:'wc_'+ev.id,source:'wc',wcId:ev.id,wcSlug:slug,
+    homeName:h.team?.shortDisplayName||h.team?.displayName||h.team?.name||'Casa',
+    awayName:a.team?.shortDisplayName||a.team?.displayName||a.team?.name||'Fora',
+    homeLogo:h.team?.logo,awayLogo:a.team?.logo,homeScore:hs,awayScore:as,
+    isLive:/in|live|progress|half|status_first|status_second|halftime/.test(raw)||st.type?.state==='in',
+    isFT:/final|ft|full|complete|status_full/.test(raw)||st.type?.completed===true,
+    date:ev.date||c.date,timeLabel:fmtTime(ev.date||c.date),minute:st.displayClock||st.type?.detail||''};
+}
+function nOL(m){
+  let hs=null,as=null;if(m.matchResults?.length){const f=m.matchResults.find(r=>r.resultTypeID===2)||m.matchResults.at(-1);hs=f?.pointsTeam1??null;as=f?.pointsTeam2??null}
+  const fin=!!m.matchIsFinished;
+  return{id:'ol_'+m.matchID,source:'ol',homeName:m.team1?.shortName||m.team1?.teamName||'Casa',awayName:m.team2?.shortName||m.team2?.teamName||'Fora',
+    homeLogo:m.team1?.teamIconUrl,awayLogo:m.team2?.teamIconUrl,homeScore:hs,awayScore:as,
+    isLive:!fin&&hs!=null,isFT:fin,date:m.matchDateTimeUTC||m.matchDateTime,timeLabel:fmtTime(m.matchDateTimeUTC||m.matchDateTime),minute:''};
+}
+function nAF(m){
+  const s=(m.fixture?.status?.short||'').toUpperCase();
+  return{id:'af_'+m.fixture?.id,source:'af',afId:m.fixture?.id,
+    homeName:m.teams?.home?.name||'Casa',awayName:m.teams?.away?.name||'Fora',
+    homeLogo:m.teams?.home?.logo,awayLogo:m.teams?.away?.logo,
+    homeScore:m.goals?.home??null,awayScore:m.goals?.away??null,
+    isLive:['1H','2H','ET','BT','P','LIVE','HT'].includes(s),isFT:['FT','AET','PEN'].includes(s),
+    date:m.fixture?.date,timeLabel:fmtTime(m.fixture?.date),minute:m.fixture?.status?.elapsed!=null?String(m.fixture.status.elapsed):''};
+}
 
-    let leagues = [];
-    let autoRefreshTimer = null;
-    const DEFAULT_FD_KEY = '28a0d62e9b3c44e5a0d9d75e628abda3';
-    // Chave API-Football (plano free) — embutida no código
-    const DEFAULT_AF_KEY = '646eb40afcfa4369ea0c809faella579';
+async function init(){
+  leagues=[];
+  try{const d=await fetchWC('/leagues?kind=club&available=true');
+    (d.leagues||[]).forEach(l=>leagues.push({id:'wc_'+l.slug,name:l.name,country:l.country||'',source:'wc',slug:l.slug}));
+  }catch(e){console.warn(e)}
+  if(getFd()) FD_COMPS.forEach(c=>leagues.push({id:'fd_'+c.code,name:c.name,country:c.country,source:'fd',code:c.code}));
+  OL_COMPS.forEach(c=>leagues.push({id:'ol_'+c.shortcut,name:c.name,country:c.country,source:'ol',shortcut:c.shortcut,season:c.season}));
+  if(getAf()) AF_COMPS.forEach(c=>leagues.push({id:'af_'+c.id,name:c.name,country:c.country,source:'af',afId:c.id,season:c.season}));
+  const pri=['Premier League','La Liga','Brasileirão Série A','Bundesliga','Serie A','Ligue 1','Libertadores','Liga Profesional'];
+  leagues.sort((a,b)=>{const pa=pri.indexOf(a.name),pb=pri.indexOf(b.name);if(pa!==-1||pb!==-1)return(pa===-1?99:pa)-(pb===-1?99:pb);return a.name.localeCompare(b.name)});
+  const opts=leagues.map(l=>`<option value="${l.id}">${l.name} (${l.country})</option>`).join('');
+  ['hojeLeague','amanhaLeague'].forEach(id=>{document.getElementById(id).innerHTML=`<option value="all">Todos os campeonatos</option>`+opts});
+  document.getElementById('hojeLeague').onchange=()=>loadToday();
+  document.getElementById('amanhaLeague').onchange=()=>loadTomorrow();
+  document.getElementById('campeonatosBadge').textContent=leagues.length+' ligas';
+  document.getElementById('campeonatosContent').innerHTML=`<div class="grid">${leagues.map(l=>`<div class="lc" onclick="goTable('${l.id}')"><h3 style="font-size:1rem;margin-bottom:4px">${l.name}</h3><p style="color:var(--muted);font-size:.82rem">${l.country}</p><span class="tag ${l.source}" style="margin-left:0;margin-top:8px;display:inline-block">${l.source}</span></div>`).join('')}</div>`;
+  loadMeta();loadToday();loadTomorrow();loadAllStandings();loadAllHistory();
+}
+function goTable(id){document.querySelector('[data-section="tabelas"]').click()}
+function findL(id){return leagues.find(l=>l.id===id)}
 
-    function getFdKey() { return localStorage.getItem('fd_api_key') || DEFAULT_FD_KEY; }
-    function getAfKey() { return localStorage.getItem('af_api_key') || DEFAULT_AF_KEY; }
+function updateTicker(evs){
+  const track=document.getElementById('tickerTrack');
+  if(!evs?.length){track.innerHTML='<span class="t-empty">Nenhum jogo no momento</span>';return}
+  const sorted=[...evs].sort((a,b)=>(b.isLive-a.isLive)||(b.isFT-a.isFT));
+  const html=sorted.slice(0,40).map(e=>{
+    const sc=(e.isFT||e.isLive||e.homeScore!=null)?`${e.homeScore??'—'}–${e.awayScore??'—'}`:(e.timeLabel||'—');
+    return `<span class="t-item"><span class="lg">${e.leagueName||''}</span><span>${e.homeName}</span><span class="sc ${e.isLive?'live':''}">${sc}</span><span>${e.awayName}</span>${e.isLive?`<span class="lv">${e.minute||'LIVE'}</span>`:''}</span>`;
+  }).join('');
+  track.innerHTML=html+html;track.style.animationDuration=Math.max(40,sorted.length*3.5)+'s';
+}
 
-    function saveFdKey() {
-      const key = document.getElementById('fdKey').value.trim();
-      if (!key) { setKeyStatus('Informe a chave FD.', false); return; }
-      localStorage.setItem('fd_api_key', key);
-      setKeyStatus('Chave FD salva!', true);
-      initLeagues();
-    }
-    function clearFdKey() {
-      localStorage.removeItem('fd_api_key');
-      document.getElementById('fdKey').value = DEFAULT_FD_KEY;
-      setKeyStatus('Usando chave FD padrão.', true);
-      initLeagues();
-    }
-    async function testFdKey() {
-      const key = document.getElementById('fdKey').value.trim() || getFdKey();
-      setKeyStatus('Testando FD...', true);
-      try {
-        const res = await fetch(`${FD_API}/competitions/PL`, { headers: { 'X-Auth-Token': key } });
-        if (res.ok) { setKeyStatus('Chave FD válida!', true); localStorage.setItem('fd_api_key', key); }
-        else setKeyStatus('FD inválida (HTTP ' + res.status + ').', false);
-      } catch (e) { setKeyStatus('Erro: ' + e.message, false); }
-    }
-    function setKeyStatus(msg, ok) {
-      const el = document.getElementById('keyStatus');
-      el.textContent = msg;
-      el.className = 'key-status ' + (ok ? 'ok' : 'err');
-    }
-
-    function saveAfKey() {
-      const key = document.getElementById('afKey').value.trim();
-      if (!key) { setAfKeyStatus('Informe a chave API-Football.', false); return; }
-      localStorage.setItem('af_api_key', key);
-      setAfKeyStatus('Chave API-Football salva! Ligas asiáticas ativadas.', true);
-      initLeagues();
-    }
-    function clearAfKey() {
-      localStorage.removeItem('af_api_key');
-      document.getElementById('afKey').value = DEFAULT_AF_KEY;
-      setAfKeyStatus('Chave personalizada removida. Usando chave padrão do código.', true);
-      initLeagues();
-    }
-    async function testAfKey() {
-      const key = document.getElementById('afKey').value.trim() || getAfKey();
-      if (!key) { setAfKeyStatus('Nenhuma chave para testar.', false); return; }
-      setAfKeyStatus('Testando API-Football...', true);
-      try {
-        const res = await fetch(`${AF_API}/status`, { headers: { 'x-apisports-key': key } });
-        const data = await res.json();
-        if (res.ok && data?.response) {
-          setAfKeyStatus('Chave válida! Plano: ' + (data.response.subscription?.plan || 'free'), true);
-          localStorage.setItem('af_api_key', key);
-        } else {
-          setAfKeyStatus('Chave inválida ou limite atingido.', false);
-        }
-      } catch (e) { setAfKeyStatus('Erro: ' + e.message, false); }
-    }
-    function setAfKeyStatus(msg, ok) {
-      const el = document.getElementById('afKeyStatus');
-      el.textContent = msg;
-      el.className = 'key-status ' + (ok ? 'ok' : 'err');
-    }
-
-    function todayISO() { return new Date().toISOString().slice(0, 10); }
-    function tomorrowISO() { const d = new Date(); d.setDate(d.getDate() + 1); return d.toISOString().slice(0, 10); }
-    function todayCompact() { return todayISO().replace(/-/g, ''); }
-    function tomorrowCompact() { return tomorrowISO().replace(/-/g, ''); }
-    function formatTime(iso) {
-      if (!iso) return '—';
-      return new Date(iso).toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' });
-    }
-    function updateStatus() {
-      const now = new Date();
-      document.getElementById('lastUpdate').textContent =
-        `Atualizado às ${now.toLocaleTimeString('pt-BR', { hour:'2-digit', minute:'2-digit', second:'2-digit' })}`;
-    }
-
-    document.getElementById('nav').addEventListener('click', (e) => {
-      const btn = e.target.closest('.nav-btn');
-      if (!btn) return;
-      document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
-      document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
-      btn.classList.add('active');
-      document.getElementById(btn.dataset.section).classList.add('active');
-      if (btn.dataset.section === 'config') {
-        document.getElementById('fdKey').value = getFdKey();
-        document.getElementById('afKey').value = getAfKey();
-        setKeyStatus(localStorage.getItem('fd_api_key') ? 'Chave FD do navegador.' : 'Chave FD padrão ativa.', true);
-        setAfKeyStatus(localStorage.getItem('af_api_key') ? 'Chave API-Football do navegador ativa — ligas asiáticas disponíveis.' : 'Chave API-Football padrão do código ativa — ligas asiáticas disponíveis.', true);
-      }
+function renderGroups(groups,boxId,badgeId,forTicker){
+  const box=document.getElementById(boxId);
+  if(!groups?.length){box.innerHTML='<div class="empty">Nenhum jogo encontrado.</div>';if(badgeId)document.getElementById(badgeId).textContent='0 jogos';if(forTicker)updateTicker([]);return}
+  let total=0,html='',tick=[];
+  groups.sort((a,b)=>{const o={fd:0,af:1,ol:2,wc:3};return(o[a.source]??9)-(o[b.source]??9)||a.name.localeCompare(b.name)});
+  groups.forEach(g=>{
+    if(!g.events?.length)return;total+=g.events.length;
+    html+=`<div class="card"><div class="lh">🏆 ${g.name}<span class="tag ${g.source}">${g.source}</span></div>`;
+    g.events.forEach(ev=>{
+      matchIndex[ev.id]=ev;tick.push({...ev,leagueName:g.name});
+      const hl=ev.homeLogo?`<img src="${ev.homeLogo}" onerror="this.style.display='none'">`:'';
+      const al=ev.awayLogo?`<img src="${ev.awayLogo}" onerror="this.style.display='none'">`:'';
+      const t=ev.timeLabel||fmtTime(ev.date);
+      html+=`<div class="match" onclick="openMatch('${ev.id}')">
+        <div class="team home"><span class="tn">${ev.homeName}</span>${hl}</div>
+        <div class="sb"><div class="sc ${ev.isLive?'live':''}">${(ev.isFT||ev.isLive||ev.homeScore!=null)?`${ev.homeScore??'—'} - ${ev.awayScore??'—'}`:t}</div>
+        <span class="st ${ev.isLive?'live':ev.isFT?'ft':'ns'}">${ev.isLive?(ev.minute?ev.minute+"'":'AO VIVO'):ev.isFT?'Encerrado':t}</span></div>
+        <div class="team away">${al}<span class="tn">${ev.awayName}</span></div></div>`;
     });
+    html+='</div>';
+  });
+  box.innerHTML=html||'<div class="empty">Nenhum jogo.</div>';
+  if(badgeId)document.getElementById(badgeId).textContent=total+' jogo'+(total!==1?'s':'');
+  if(forTicker)updateTicker(tick);stamp();
+}
 
-    async function fetchWC(path) {
-      const res = await fetch(`${WC_API}${path}`);
-      if (!res.ok) throw new Error(`WC HTTP ${res.status}`);
-      return res.json();
-    }
-    async function fetchFD(path) {
-      const key = getFdKey();
-      if (!key) throw new Error('Sem chave FD');
-      const res = await fetch(`${FD_API}${path}`, { headers: { 'X-Auth-Token': key } });
-      if (!res.ok) throw new Error(`FD HTTP ${res.status}`);
-      return res.json();
-    }
-    async function fetchOL(path) {
-      const res = await fetch(`${OL_API}${path}`);
-      if (!res.ok) throw new Error(`OL HTTP ${res.status}`);
-      return res.json();
-    }
-    async function fetchAF(path) {
-      const key = getAfKey();
-      if (!key) throw new Error('Sem chave API-Football');
-      const res = await fetch(`${AF_API}${path}`, { headers: { 'x-apisports-key': key } });
-      if (!res.ok) throw new Error(`AF HTTP ${res.status}`);
-      return res.json();
-    }
-
-    async function initLeagues() {
-      leagues = [];
-
-      try {
-        const data = await fetchWC('/leagues?kind=club&available=true');
-        (data.leagues || []).forEach(l => {
-          leagues.push({
-            id: 'wc_' + l.slug, name: l.name, country: l.country || '', source: 'wc',
-            slug: l.slug, season: l.season?.display_name || '', matches: l.coverage?.matches || 0,
-          });
-        });
-      } catch (e) { console.warn('WC', e); }
-
-      if (getFdKey()) {
-        FD_COMPS.forEach(c => {
-          leagues.push({ id: 'fd_' + c.code, name: c.name, country: c.country, source: 'fd', code: c.code, type: c.type });
+async function loadMatches(dateISO,dateC,leagueId,boxId,badgeId,forTicker){
+  const box=document.getElementById(boxId);
+  box.innerHTML='<div class="loading"><div class="spinner"></div>Buscando todos os jogos...</div>';
+  const groups=[],seen=new Set();
+  const add=(name,source,evs)=>{
+    const filtered=evs.filter(e=>{const k=(e.homeName+'|'+e.awayName+'|'+dateISO).toLowerCase();if(seen.has(k))return false;seen.add(k);return true});
+    if(filtered.length)groups.push({name,source,events:filtered});
+  };
+  try{
+    if(leagueId==='all'){
+      // FD por competição (mais completo que /matches?date=)
+      if(getFd()){
+        const results=await Promise.allSettled(FD_COMPS.map(c=>fetchFD(`/competitions/${c.code}/matches?dateFrom=${dateISO}&dateTo=${dateISO}`)));
+        results.forEach((r,i)=>{
+          if(r.status!=='fulfilled')return;
+          const evs=(r.value.matches||[]).map(nFD);
+          add(FD_COMPS[i].name,'fd',evs);
         });
       }
+      // Free API todas
+      const wcs=leagues.filter(l=>l.source==='wc');
+      const wr=await Promise.allSettled(wcs.map(l=>fetchWC(`/${l.slug}/scoreboard?dates=${dateC}`)));
+      wr.forEach((r,i)=>{if(r.status!=='fulfilled')return;add(wcs[i].name,'wc',extractWC(r.value).map(e=>nWC(e,wcs[i].slug)))});
+      // OL
+      for(const ol of OL_COMPS){
+        try{const d=await fetchOL(`/getmatchdata/${ol.shortcut}/${ol.season}`);
+          const evs=(Array.isArray(d)?d:[]).filter(m=>(m.matchDateTimeUTC||m.matchDateTime||'').slice(0,10)===dateISO).map(nOL);
+          add(ol.name,'ol',evs);
+        }catch(_){}
+      }
+      // AF (SA + Ásia) — uma chamada por data
+      if(getAf()){
+        try{
+          const d=await fetchAF(`/fixtures?date=${dateISO}`);
+          const by={};
+          (d.response||[]).forEach(m=>{
+            const id=m.league?.id, name=m.league?.name||'Liga', country=m.league?.country||'';
+            const want=AF_COMPS.some(c=>c.id===id)||['Brazil','Argentina','Colombia','Chile','Peru','Uruguay','Mexico','Paraguay','Ecuador','Japan','China','South-Korea','Saudi-Arabia','Australia'].includes(country);
+            if(!want)return;
+            if(!by[id])by[id]={name:name+(country?' ('+country+')':''),events:[]};
+            by[id].events.push(nAF(m));
+          });
+          Object.values(by).forEach(g=>add(g.name,'af',g.events));
+        }catch(e){console.warn('AF',e)}
+      }
+    }else{
+      const L=findL(leagueId);if(!L)throw new Error('Liga não encontrada');
+      if(L.source==='fd'){const d=await fetchFD(`/competitions/${L.code}/matches?dateFrom=${dateISO}&dateTo=${dateISO}`);add(L.name,'fd',(d.matches||[]).map(nFD))}
+      else if(L.source==='wc'){const d=await fetchWC(`/${L.slug}/scoreboard?dates=${dateC}`);add(L.name,'wc',extractWC(d).map(e=>nWC(e,L.slug)))}
+      else if(L.source==='ol'){const d=await fetchOL(`/getmatchdata/${L.shortcut}/${L.season}`);add(L.name,'ol',(Array.isArray(d)?d:[]).filter(m=>(m.matchDateTimeUTC||m.matchDateTime||'').slice(0,10)===dateISO).map(nOL))}
+      else if(L.source==='af'){const d=await fetchAF(`/fixtures?league=${L.afId}&season=${L.season}&date=${dateISO}`);add(L.name,'af',(d.response||[]).map(nAF))}
+    }
+  }catch(e){box.innerHTML=`<div class="empty">Erro: ${e.message}</div>`;return}
+  renderGroups(groups,boxId,badgeId,forTicker);
+}
+function loadToday(){loadMatches(todayISO(),compact(todayISO()),document.getElementById('hojeLeague').value,'hojeContent','hojeBadge',true)}
+function loadTomorrow(){loadMatches(tomorrowISO(),compact(tomorrowISO()),document.getElementById('amanhaLeague').value,'amanhaContent','amanhaBadge',false)}
 
-      OL_COMPS.forEach(c => {
-        leagues.push({
-          id: 'ol_' + c.shortcut, name: c.name, country: c.country, source: 'ol',
-          shortcut: c.shortcut, season: c.season, type: c.type,
+/* ===== Modal estatísticas ===== */
+function closeModal(){document.getElementById('modalBg').classList.remove('open')}
+async function openMatch(id){
+  const ev=matchIndex[id];if(!ev)return;
+  const bg=document.getElementById('modalBg'), body=document.getElementById('modalBody');
+  bg.classList.add('open');
+  const hl=ev.homeLogo?`<img src="${ev.homeLogo}">`:'', al=ev.awayLogo?`<img src="${ev.awayLogo}">`:'';
+  const score=(ev.isFT||ev.isLive||ev.homeScore!=null)?`${ev.homeScore??'—'} - ${ev.awayScore??'—'}`:(ev.timeLabel||'—');
+  body.innerHTML=`<h3>${ev.homeName} vs ${ev.awayName}</h3><div class="sub">${ev.isLive?'AO VIVO '+(ev.minute||''):ev.isFT?'Encerrado':ev.timeLabel||''}</div>
+    <div class="scoreline">${hl}<span>${score}</span>${al}</div><div class="loading"><div class="spinner"></div>Carregando estatísticas...</div>`;
+  try{
+    if(ev.source==='wc'&&ev.wcId&&ev.wcSlug){
+      const d=await fetchWC(`/${ev.wcSlug}/summary?event=${ev.wcId}`);
+      const events=d.keyEvents||[];
+      const teams=d.boxscore?.teams||[];
+      let html=`<h3>${ev.homeName} vs ${ev.awayName}</h3><div class="sub">Estatísticas da partida</div><div class="scoreline">${hl}<span>${score}</span>${al}</div>`;
+      if(events.length){
+        html+='<h4 style="margin:12px 0 6px;font-size:.9rem">Eventos</h4><ul class="ev-list">';
+        events.slice(0,30).forEach(e=>{
+          const min=e.clock?.displayValue||e.clock?.value||'';
+          const text=e.type?.text||e.text||e.type?.type||'Evento';
+          const player=e.athletesInvolved?.[0]?.displayName||e.participants?.[0]?.athlete?.displayName||'';
+          html+=`<li><span class="min">${min}</span><span>${text}${player?' — '+player:''}</span></li>`;
         });
-      });
-
-      // Ligas asiáticas (só se houver chave API-Football)
-      if (getAfKey()) {
-        AF_ASIA_COMPS.forEach(c => {
-          leagues.push({
-            id: 'af_' + c.id, name: c.name, country: c.country, source: 'af',
-            afId: c.id, season: c.season, type: c.type,
+        html+='</ul>';
+      }
+      if(teams.length){
+        html+='<h4 style="margin:12px 0 6px;font-size:.9rem">Estatísticas</h4>';
+        teams.forEach(t=>{
+          html+=`<p style="font-weight:700;margin:8px 0 4px">${t.team?.displayName||t.team?.name||''}</p>`;
+          (t.statistics||[]).slice(0,12).forEach(s=>{
+            html+=`<div style="display:flex;justify-content:space-between;font-size:.82rem;padding:3px 0;border-bottom:1px solid var(--border)"><span style="color:var(--muted)">${s.name||s.displayValue}</span><strong>${s.displayValue??s.value??'—'}</strong></div>`;
           });
         });
       }
-
-      const priority = [
-        'Premier League', 'La Liga', 'Bundesliga', 'Serie A', 'Ligue 1',
-        'UEFA Champions League', 'Campeonato Brasileiro Série A',
-        'J1 League', 'K League 1', 'Chinese Super League', 'Saudi Pro League',
-        'A-League Men', 'AFC Champions League Elite',
-        '2. Bundesliga', '3. Liga', 'Championship'
-      ];
-      leagues.sort((a, b) => {
-        const pa = priority.indexOf(a.name);
-        const pb = priority.indexOf(b.name);
-        if (pa !== -1 || pb !== -1) return (pa === -1 ? 99 : pa) - (pb === -1 ? 99 : pb);
-        return a.name.localeCompare(b.name);
-      });
-
-      populateSelects();
-      renderCampeonatos();
-      loadMeta();
-      loadToday();
-      loadTomorrow();
+      if(!events.length&&!teams.length) html+=`<p class="hint">Detalhes limitados para esta partida.</p>`;
+      body.innerHTML=html;
+    }else if(ev.source==='fd'&&ev.fdId){
+      try{
+        const d=await fetchFD(`/matches/${ev.fdId}`);
+        let html=`<h3>${ev.homeName} vs ${ev.awayName}</h3><div class="sub">${d.status||''} · ${d.venue||''}</div><div class="scoreline">${hl}<span>${score}</span>${al}</div>`;
+        const ht=d.score?.halfTime;if(ht)html+=`<p class="hint">Intervalo: ${ht.home??'—'} - ${ht.away??'—'}</p>`;
+        if(d.referees?.length)html+=`<p class="hint">Árbitro: ${d.referees.map(r=>r.name).join(', ')}</p>`;
+        html+=`<p class="hint">Fonte: football-data.org (detalhes avançados no plano free são limitados).</p>`;
+        body.innerHTML=html;
+      }catch(_){body.innerHTML=`<h3>${ev.homeName} vs ${ev.awayName}</h3><div class="scoreline">${hl}<span>${score}</span>${al}</div><p class="hint">Detalhes indisponíveis.</p>`}
+    }else{
+      body.innerHTML=`<h3>${ev.homeName} vs ${ev.awayName}</h3><div class="scoreline">${hl}<span>${score}</span>${al}</div><p class="hint">Estatísticas detalhadas disponíveis principalmente via Free API (Inglaterra/Espanha).</p>`;
     }
+  }catch(e){body.innerHTML=`<h3>${ev.homeName} vs ${ev.awayName}</h3><div class="scoreline">${hl}<span>${score}</span>${al}</div><p class="hint">Erro: ${e.message}</p>`}
+}
 
-    function populateSelects() {
-      const opts = leagues.map(l => {
-        const tag = { fd: ' [FD]', wc: ' [Free]', ol: ' [OL]', af: ' [Ásia]' }[l.source] || '';
-        return `<option value="${l.id}">${l.name} (${l.country})${tag}</option>`;
-      }).join('');
-      ['hojeLeague', 'amanhaLeague'].forEach(id => {
-        document.getElementById(id).innerHTML = `<option value="all">Todos os campeonatos</option>` + opts;
-      });
-      ['tabelaLeague', 'histLeague'].forEach(id => {
-        document.getElementById(id).innerHTML = opts;
-        if (leagues.length) {
-          const preferred = leagues.find(l => l.id === 'fd_PL') || leagues[0];
-          document.getElementById(id).value = preferred.id;
-        }
-      });
-    }
-
-    function renderCampeonatos() {
-      const container = document.getElementById('campeonatosContent');
-      document.getElementById('campeonatosBadge').textContent = leagues.length + ' ligas';
-      if (!leagues.length) {
-        container.innerHTML = `<div class="empty">Nenhum campeonato disponível.</div>`;
-        return;
+/* ===== Todas as tabelas ===== */
+async function loadAllStandings(){
+  const box=document.getElementById('tabelaContent');
+  box.innerHTML='<div class="loading"><div class="spinner"></div>Carregando tabelas...</div>';
+  const blocks=[];
+  // Free API standings
+  const wcs=leagues.filter(l=>l.source==='wc').slice(0,8);
+  const year=new Date().getFullYear();
+  for(const L of wcs){
+    try{
+      let entries=[];
+      for(const s of [year,year-1,2026,2025]){
+        try{const d=await fetchWC(`/${L.slug}/standings?season=${s}`);
+          entries=d.children?.[0]?.standings?.entries||d.standings?.entries||[];
+          if(entries.length)break;
+        }catch(_){}
       }
-      const srcLabel = { fd: 'football-data.org', wc: 'Free API', ol: 'OpenLigaDB', af: 'API-Football · Ásia' };
-      container.innerHTML = `<div class="grid">${leagues.map(l => `
-        <div class="league-card" onclick="selectLeague('${l.id}')">
-          <h3>${l.name}</h3>
-          <p>${l.country}${l.season ? ' · ' + l.season : ''}</p>
-          <p style="margin-top:8px;font-size:0.8rem;">
-            <span class="src-tag ${l.source}">${srcLabel[l.source] || l.source}</span>
-            ${l.source === 'fd' ? ' · Escudos oficiais' : ''}
-            ${l.source === 'af' ? ' · Ásia/Oceania' : ''}
-          </p>
-        </div>
-      `).join('')}</div>
-`;
+      if(!entries.length)continue;
+      entries.sort((a,b)=>+(a.rank||99)-+(b.rank||99));
+      blocks.push(renderStandHTML(L.name,'wc',entries.map((e,i)=>{
+        const st={};(e.stats||[]).forEach(s=>st[s.name]=s.displayValue);
+        return{pos:e.rank||i+1,name:e.team?.displayName||e.team?.name,logo:e.team?.logo,j:st.gamesPlayed,v:st.wins,e:st.ties,d:st.losses,gp:st.pointsFor,gc:st.pointsAgainst,sg:st.pointDifferential,pts:st.points};
+      })));
+    }catch(_){}
+  }
+  // FD standings (priorizar principais)
+  if(getFd()){
+    for(const c of FD_COMPS.slice(0,8)){
+      try{
+        const d=await fetchFD(`/competitions/${c.code}/standings`);
+        const table=d.standings?.find(s=>s.type==='TOTAL')?.table||d.standings?.[0]?.table||[];
+        if(!table.length)continue;
+        blocks.push(renderStandHTML(c.name,'fd',table.map((r,i)=>({
+          pos:r.position||i+1,name:r.team?.shortName||r.team?.name,logo:r.team?.crest,
+          j:r.playedGames,v:r.won,e:r.draw,d:r.lost,gp:r.goalsFor,gc:r.goalsAgainst,sg:r.goalDifference,pts:r.points
+        }))));
+      }catch(_){}
     }
+  }
+  document.getElementById('tabelasBadge').textContent=blocks.length+' tabelas';
+  box.innerHTML=blocks.length?blocks.join(''):'<div class="empty">Nenhuma tabela disponível no momento.</div>';
+  stamp();
+}
+function renderStandHTML(name,src,rows){
+  const body=rows.map(r=>{
+    const pc=r.pos<=4?'top':(r.pos>=rows.length-2?'bottom':'');
+    const img=r.logo?`<img src="${r.logo}" onerror="this.style.display='none'">`:'';
+    return`<tr><td class="pos ${pc}">${r.pos}</td><td><div class="tc">${img}${r.name||'—'}</div></td>
+      <td>${r.j??'—'}</td><td>${r.v??'—'}</td><td>${r.e??'—'}</td><td>${r.d??'—'}</td>
+      <td>${r.gp??'—'}</td><td>${r.gc??'—'}</td><td>${r.sg??'—'}</td><td><strong>${r.pts??'—'}</strong></td></tr>`;
+  }).join('');
+  return`<div class="stand-block card"><h3>🏆 ${name} <span class="tag ${src}">${src}</span></h3>
+    <div class="table-wrap"><table><thead><tr><th>#</th><th>Time</th><th>J</th><th>V</th><th>E</th><th>D</th><th>GP</th><th>GC</th><th>SG</th><th>Pts</th></tr></thead><tbody>${body}</tbody></table></div></div>`;
+}
 
-    function selectLeague(id) {
-      document.getElementById('tabelaLeague').value = id;
-      document.getElementById('histLeague').value = id;
-      document.querySelector('[data-section="tabelas"]').click();
-      loadStandings();
+/* ===== Histórico automático ===== */
+async function loadAllHistory(){
+  const box=document.getElementById('histContent');
+  box.innerHTML='<div class="loading"><div class="spinner"></div>Carregando histórico...</div>';
+  const groups=[];
+  if(getFd()){
+    for(const c of FD_COMPS.slice(0,6)){
+      try{
+        const d=await fetchFD(`/competitions/${c.code}/matches?status=FINISHED&limit=12`);
+        const evs=(d.matches||[]).sort((a,b)=>new Date(b.utcDate)-new Date(a.utcDate)).slice(0,10).map(nFD);
+        if(evs.length)groups.push({name:c.name,source:'fd',events:evs});
+      }catch(_){}
     }
-    function findLeague(id) { return leagues.find(l => l.id === id); }
+  }
+  // Free API últimos dias eng.1 / esp.1
+  for(const slug of ['eng.1','esp.1']){
+    try{
+      const dates=[];for(let i=1;i<=5;i++){const d=new Date();d.setDate(d.getDate()-i);dates.push(compact(localISO(d)))}
+      let evs=[];
+      const rs=await Promise.allSettled(dates.map(dt=>fetchWC(`/${slug}/scoreboard?dates=${dt}`)));
+      rs.forEach(r=>{if(r.status==='fulfilled')evs.push(...extractWC(r.value).map(e=>nWC(e,slug)).filter(e=>e.isFT))});
+      if(evs.length)groups.push({name:slug==='eng.1'?'Premier League':'La Liga',source:'wc',events:evs.slice(0,12)});
+    }catch(_){}
+  }
+  renderGroups(groups,'histContent',null,false);
+}
 
-    function renderMatchGroups(groups, containerId, badgeId, forTicker) {
-      const container = document.getElementById(containerId);
-      if (!groups || !groups.length) {
-        container.innerHTML = `<div class="empty">Nenhum jogo encontrado para esta data.</div>`;
-        if (badgeId) document.getElementById(badgeId).textContent = '0 jogos';
-        if (forTicker) updateTicker([]);
-        return;
-      }
-      const tickerEvts = [];
-      let total = 0;
-      let html = '';
-      const srcLabel = { fd: 'FD · Escudos oficiais', wc: 'Free', ol: 'OpenLigaDB', af: 'API-Football · Ásia' };
-      groups.sort((a, b) => {
-        const order = { fd: 0, af: 1, ol: 2, wc: 3 };
-        if (a.source !== b.source) return (order[a.source] ?? 9) - (order[b.source] ?? 9);
-        return (a.name || '').localeCompare(b.name || '');
-      });
-      groups.forEach(g => {
-        const events = g.events || [];
-        if (!events.length) return;
-        total += events.length;
-        html += `<div class="card"><div class="league-header">🏆 ${g.name}
-          <span class="src-tag ${g.source}">${srcLabel[g.source] || g.source}</span></div>`;
-        events.forEach(ev => {
-          if (forTicker) tickerEvts.push({ ...ev, leagueName: g.name });
-          const homeLogo = ev.homeLogo ? `<img class="crest" src="${ev.homeLogo}" alt="" onerror="this.style.display='none'">` : '';
-          const awayLogo = ev.awayLogo ? `<img class="crest" src="${ev.awayLogo}" alt="" onerror="this.style.display='none'">` : '';
-          const isLive = ev.isLive, isFT = ev.isFT;
-          const time = ev.timeLabel || formatTime(ev.date);
-          html += `<div class="match">
-            <div class="team home"><span class="team-name">${ev.homeName || 'Casa'}</span>${homeLogo}</div>
-            <div class="score-box">
-              <div class="score ${isLive ? 'live' : ''}">${(isFT || isLive || ev.homeScore != null) ? `${ev.homeScore ?? '—'} - ${ev.awayScore ?? '—'}` : time}</div>
-              <span class="status-badge ${isLive ? 'live' : isFT ? 'ft' : 'ns'}">${isLive ? (ev.minute ? ev.minute + "'" : 'AO VIVO') : isFT ? 'Encerrado' : time}</span>
-            </div>
-            <div class="team away">${awayLogo}<span class="team-name">${ev.awayName || 'Fora'}</span></div>
-          </div>`;
-        });
-        html += `</div>`;
-      });
-      container.innerHTML = html || `<div class="empty">Nenhum jogo encontrado.</div>`;
-      if (badgeId) document.getElementById(badgeId).textContent = `${total} jogo${total !== 1 ? 's' : ''}`;
-      if (forTicker) updateTicker(tickerEvts);
-      updateStatus();
-    }
+async function loadMeta(){
+  try{
+    const m=await fetchWC('/meta'),c=m.coverage||{};
+    document.getElementById('statsContent').innerHTML=`<div class="stats-grid">
+      <div class="stat-card"><div class="stat-value">${c.competitions||'—'}</div><div class="stat-label">Free API</div></div>
+      <div class="stat-card"><div class="stat-value">${FD_COMPS.length}</div><div class="stat-label">football-data</div></div>
+      <div class="stat-card"><div class="stat-value">${OL_COMPS.length}</div><div class="stat-label">OpenLigaDB</div></div>
+      <div class="stat-card"><div class="stat-value">${getAf()?AF_COMPS.length:0}</div><div class="stat-label">SA/Ásia (AF)</div></div>
+      <div class="stat-card"><div class="stat-value">${leagues.length}</div><div class="stat-label">Total ligas</div></div>
+      <div class="stat-card"><div class="stat-value">${c.matches||'—'}</div><div class="stat-label">Jogos Free</div></div>
+    </div>
+    <div class="card"><p><strong>América do Sul:</strong> ${getAf()?'API-Football ativa (Libertadores, Brasil, Argentina…)':'adicione chave API-Football em Config para Libertadores, Argentina, etc. Brasileirão (tabela) via football-data.org.'}</p>
+    <p class="hint" style="margin-top:8px">Clique em qualquer jogo para ver estatísticas e eventos da partida.</p></div>`;
+  }catch(_){document.getElementById('statsContent').innerHTML='<div class="empty">Metadados indisponíveis.</div>'}
+}
 
-    function normalizeFDMatch(m) {
-      const status = (m.status || '').toUpperCase();
-      const isLive = ['IN_PLAY', 'PAUSED', 'EXTRA_TIME', 'PENALTY_SHOOTOUT'].includes(status);
-      const isFT = status === 'FINISHED' || status === 'AWARDED';
-      return {
-        homeName: m.homeTeam?.shortName || m.homeTeam?.name || 'Casa',
-        awayName: m.awayTeam?.shortName || m.awayTeam?.name || 'Fora',
-        homeLogo: m.homeTeam?.crest || null, awayLogo: m.awayTeam?.crest || null,
-        homeScore: m.score?.fullTime?.home ?? null, awayScore: m.score?.fullTime?.away ?? null,
-        isLive, isFT, date: m.utcDate, timeLabel: formatTime(m.utcDate), minute: m.minute || '',
-      };
-    }
-    function normalizeWCEvent(ev) {
-      const home = ev.competitions?.[0]?.competitors?.find(c => c.homeAway === 'home') || ev.home || ev.teams?.home || {};
-      const away = ev.competitions?.[0]?.competitors?.find(c => c.homeAway === 'away') || ev.away || ev.teams?.away || {};
-      const statusRaw = (ev.status?.type?.name || ev.status || 'scheduled').toLowerCase();
-      const isLive = /in|live|progress/.test(statusRaw);
-      const isFT = /final|ft|full/.test(statusRaw);
-      let homeScore = home.score ?? home.score?.displayValue ?? null;
-      let awayScore = away.score ?? away.score?.displayValue ?? null;
-      if (homeScore === '—') homeScore = null;
-      if (awayScore === '—') awayScore = null;
-      return {
-        homeName: home.team?.displayName || home.team?.name || home.name || 'Casa',
-        awayName: away.team?.displayName || away.team?.name || away.name || 'Fora',
-        homeLogo: home.team?.logo || home.logo || null, awayLogo: away.team?.logo || away.logo || null,
-        homeScore, awayScore, isLive, isFT,
-        date: ev.date || ev.startTime || ev.kickoff,
-        timeLabel: formatTime(ev.date || ev.startTime || ev.kickoff),
-        minute: ev.status?.displayClock || ev.minute || '',
-      };
-    }
-    function normalizeOLMatch(m) {
-      const finished = !!m.matchIsFinished;
-      let homeScore = null, awayScore = null;
-      if (m.matchResults?.length) {
-        const final = m.matchResults.find(r => r.resultTypeID === 2) || m.matchResults[m.matchResults.length - 1];
-        homeScore = final?.pointsTeam1 ?? null;
-        awayScore = final?.pointsTeam2 ?? null;
-      }
-      return {
-        homeName: m.team1?.shortName || m.team1?.teamName || 'Casa',
-        awayName: m.team2?.shortName || m.team2?.teamName || 'Fora',
-        homeLogo: m.team1?.teamIconUrl || null, awayLogo: m.team2?.teamIconUrl || null,
-        homeScore, awayScore, isLive: !finished && homeScore != null, isFT: finished,
-        date: m.matchDateTimeUTC || m.matchDateTime,
-        timeLabel: formatTime(m.matchDateTimeUTC || m.matchDateTime), minute: '',
-      };
-    }
-    function normalizeAFMatch(m) {
-      const st = (m.fixture?.status?.short || '').toUpperCase();
-      const isLive = ['1H', '2H', 'ET', 'BT', 'P', 'LIVE', 'HT'].includes(st);
-      const isFT = ['FT', 'AET', 'PEN'].includes(st);
-      return {
-        homeName: m.teams?.home?.name || 'Casa',
-        awayName: m.teams?.away?.name || 'Fora',
-        homeLogo: m.teams?.home?.logo || null,
-        awayLogo: m.teams?.away?.logo || null,
-        homeScore: m.goals?.home ?? null,
-        awayScore: m.goals?.away ?? null,
-        isLive, isFT,
-        date: m.fixture?.date,
-        timeLabel: formatTime(m.fixture?.date),
-        minute: m.fixture?.status?.elapsed != null ? String(m.fixture.status.elapsed) : '',
-      };
-    }
-
-    async function loadMatchesForDate(dateISO, dateCompact, leagueId, containerId, badgeId, forTicker) {
-      const container = document.getElementById(containerId);
-      container.innerHTML = `<div class="loading"><div class="spinner"></div>Carregando todos os jogos...</div>`;
-      const groups = [];
-      const seen = new Set();
-
-      try {
-        if (leagueId === 'all') {
-          if (getFdKey()) {
-            try {
-              const data = await fetchFD(`/matches?date=${dateISO}`);
-              const byComp = {};
-              (data.matches || []).forEach(m => {
-                const code = m.competition?.code || 'other';
-                const name = m.competition?.name || code;
-                if (!byComp[code]) byComp[code] = { name, source: 'fd', events: [] };
-                const ev = normalizeFDMatch(m);
-                byComp[code].events.push(ev);
-                seen.add(`${ev.homeName}|${ev.awayName}|${dateISO}`.toLowerCase());
-              });
-              Object.values(byComp).forEach(g => { if (g.events.length) groups.push(g); });
-            } catch (e) { console.warn('FD', e); }
-          }
-
-          // Ásia via API-Football (uma chamada por data cobre várias ligas)
-          if (getAfKey()) {
-            try {
-              const data = await fetchAF(`/fixtures?date=${dateISO}`);
-              const byLeague = {};
-              (data.response || []).forEach(m => {
-                const lid = m.league?.id;
-                const name = m.league?.name || 'Liga';
-                const country = m.league?.country || '';
-                // Filtrar só as que queremos destacar como Ásia + aceitar outras se vierem
-                const isAsia = AF_ASIA_COMPS.some(c => c.id === lid) ||
-                  ['Japan', 'South-Korea', 'China', 'Saudi-Arabia', 'Australia', 'Thailand', 'India', 'Qatar', 'United-Arab-Emirates', 'Indonesia', 'Malaysia', 'Vietnam']
-                    .includes(country);
-                if (!isAsia && !AF_ASIA_COMPS.some(c => c.id === lid)) return;
-                if (!byLeague[lid]) byLeague[lid] = { name: name + (country ? ` (${country})` : ''), source: 'af', events: [] };
-                const ev = normalizeAFMatch(m);
-                const key = `${ev.homeName}|${ev.awayName}|${dateISO}`.toLowerCase();
-                if (seen.has(key)) return;
-                seen.add(key);
-                byLeague[lid].events.push(ev);
-              });
-              Object.values(byLeague).forEach(g => { if (g.events.length) groups.push(g); });
-            } catch (e) { console.warn('AF', e); }
-          }
-
-          for (const ol of OL_COMPS) {
-            try {
-              const data = await fetchOL(`/getmatchdata/${ol.shortcut}/${ol.season}`);
-              const events = (Array.isArray(data) ? data : [])
-                .filter(m => (m.matchDateTimeUTC || m.matchDateTime || '').slice(0, 10) === dateISO)
-                .map(normalizeOLMatch)
-                .filter(ev => {
-                  const key = `${ev.homeName}|${ev.awayName}|${dateISO}`.toLowerCase();
-                  if (seen.has(key)) return false;
-                  seen.add(key);
-                  return true;
-                });
-              if (events.length) groups.push({ name: ol.name, source: 'ol', events });
-            } catch (e) { console.warn('OL', e); }
-          }
-
-          const wcLeagues = leagues.filter(l => l.source === 'wc');
-          const results = await Promise.allSettled(wcLeagues.map(l => fetchWC(`/${l.slug}/scoreboard?dates=${dateCompact}`)));
-          results.forEach((r, i) => {
-            if (r.status !== 'fulfilled') return;
-            const d = r.value;
-            let events = d.events || d.leagues?.[0]?.events || [];
-            if (!events.length && d.leagues) {
-              d.leagues.forEach(lg => {
-                if (lg.events?.length) {
-                  const mapped = lg.events.map(normalizeWCEvent).filter(ev => {
-                    const key = `${ev.homeName}|${ev.awayName}|${dateISO}`.toLowerCase();
-                    if (seen.has(key)) return false;
-                    seen.add(key);
-                    return true;
-                  });
-                  if (mapped.length) groups.push({ name: lg.name || wcLeagues[i].name, source: 'wc', events: mapped });
-                }
-              });
-            } else if (events.length) {
-              const mapped = events.map(normalizeWCEvent).filter(ev => {
-                const key = `${ev.homeName}|${ev.awayName}|${dateISO}`.toLowerCase();
-                if (seen.has(key)) return false;
-                seen.add(key);
-                return true;
-              });
-              if (mapped.length) groups.push({ name: wcLeagues[i].name, source: 'wc', events: mapped });
-            }
-          });
-        } else {
-          const league = findLeague(leagueId);
-          if (!league) throw new Error('Liga não encontrada');
-
-          if (league.source === 'fd') {
-            const data = await fetchFD(`/competitions/${league.code}/matches?dateFrom=${dateISO}&dateTo=${dateISO}`);
-            const events = (data.matches || []).map(normalizeFDMatch);
-            if (events.length) groups.push({ name: league.name, source: 'fd', events });
-          } else if (league.source === 'ol') {
-            const data = await fetchOL(`/getmatchdata/${league.shortcut}/${league.season}`);
-            const events = (Array.isArray(data) ? data : [])
-              .filter(m => (m.matchDateTimeUTC || m.matchDateTime || '').slice(0, 10) === dateISO)
-              .map(normalizeOLMatch);
-            if (events.length) groups.push({ name: league.name, source: 'ol', events });
-          } else if (league.source === 'af') {
-            const data = await fetchAF(`/fixtures?league=${league.afId}&season=${league.season}&date=${dateISO}`);
-            const events = (data.response || []).map(normalizeAFMatch);
-            if (events.length) groups.push({ name: league.name, source: 'af', events });
-          } else {
-            const data = await fetchWC(`/${league.slug}/scoreboard?dates=${dateCompact}`);
-            let events = data.events || data.leagues?.[0]?.events || [];
-            if (!events.length && data.leagues) events = data.leagues.flatMap(lg => lg.events || []);
-            if (events.length) groups.push({ name: league.name, source: 'wc', events: events.map(normalizeWCEvent) });
-          }
-        }
-      } catch (err) {
-        console.error(err);
-        container.innerHTML = `<div class="empty">Erro ao carregar jogos: ${err.message}</div>`;
-        return;
-      }
-      renderMatchGroups(groups, containerId, badgeId, forTicker);
-    }
-
-    
-    function updateTicker(allEvents) {
-      const track = document.getElementById('tickerTrack');
-      if (!track) return;
-      if (!allEvents || !allEvents.length) {
-        track.innerHTML = '<span class="ticker-empty">Nenhum jogo no momento · Atualizando...</span>';
-        return;
-      }
-      const sorted = [...allEvents].sort((a,b)=>{
-        if (a.isLive !== b.isLive) return a.isLive ? -1 : 1;
-        if (a.isFT !== b.isFT) return a.isFT ? -1 : 1;
-        return 0;
-      });
-      const items = sorted.slice(0,40).map(ev=>{
-        const score = (ev.isFT||ev.isLive||ev.homeScore!=null)
-          ? `${ev.homeScore??'—'}–${ev.awayScore??'—'}` : (ev.timeLabel||'—');
-        const liveTag = ev.isLive ? `<span class="t-live">${ev.minute||'LIVE'}</span>` : '';
-        return `<span class="ticker-item"><span class="t-league">${ev.leagueName||''}</span><span>${ev.homeName||'Casa'}</span><span class="t-score ${ev.isLive?'live':''}">${score}</span><span>${ev.awayName||'Fora'}</span>${liveTag}</span>`;
-      }).join('');
-      track.innerHTML = items + items;
-      track.style.animationDuration = Math.max(40, sorted.length*4) + 's';
-    }
-
-    function loadToday() {
-      loadMatchesForDate(todayISO(), todayCompact(), document.getElementById('hojeLeague').value, 'hojeContent', 'hojeBadge', true);
-    }
-    function loadTomorrow() {
-      loadMatchesForDate(tomorrowISO(), tomorrowCompact(), document.getElementById('amanhaLeague').value, 'amanhaContent', 'amanhaBadge', false);
-    }
-
-    async function loadStandings() {
-      const id = document.getElementById('tabelaLeague').value;
-      const league = findLeague(id);
-      const container = document.getElementById('tabelaContent');
-      if (!league) { container.innerHTML = `<div class="empty">Selecione um campeonato.</div>`; return; }
-      container.innerHTML = `<div class="loading"><div class="spinner"></div>Carregando tabela...</div>`;
-
-      try {
-        if (league.source === 'fd') {
-          const data = await fetchFD(`/competitions/${league.code}/standings`);
-          const table = data.standings?.find(s => s.type === 'TOTAL')?.table || data.standings?.[0]?.table || [];
-          if (!table.length) { container.innerHTML = `<div class="empty">Tabela indisponível.</div>`; return; }
-          renderFDTable(table, container);
-        } else if (league.source === 'af') {
-          const data = await fetchAF(`/standings?league=${league.afId}&season=${league.season}`);
-          const rows = data.response?.[0]?.league?.standings?.[0] || data.response?.[0]?.league?.standings || [];
-          const flat = Array.isArray(rows[0]) ? rows.flat() : rows;
-          if (!flat.length) { container.innerHTML = `<div class="empty">Tabela ainda não disponível.</div>`; return; }
-          renderAFTable(flat, container);
-        } else if (league.source === 'ol') {
-          container.innerHTML = `<div class="empty">Tabela não disponível via OpenLigaDB. Use histórico ou outra fonte.</div>`;
-        } else {
-          let entries = [];
-          for (const season of [2026, 2025, '']) {
-            try {
-              const path = season ? `/${league.slug}/standings?season=${season}` : `/${league.slug}/standings`;
-              const data = await fetchWC(path);
-              entries = data.children?.[0]?.standings?.entries || data.standings?.entries || data.entries || [];
-              if (entries.length) break;
-            } catch (_) {}
-          }
-          if (!entries.length) { container.innerHTML = `<div class="empty">Tabela indisponível.</div>`; return; }
-          entries.sort((a, b) => {
-            const ra = +(a.stats?.find(s => s.name === 'rank')?.displayValue || 99);
-            const rb = +(b.stats?.find(s => s.name === 'rank')?.displayValue || 99);
-            return ra - rb;
-          });
-          renderWCTable(entries, container);
-        }
-        updateStatus();
-      } catch (err) {
-        container.innerHTML = `<div class="empty">Erro: ${err.message}</div>`;
-      }
-    }
-
-    function renderFDTable(table, container) {
-      const rows = table.map((row, idx) => {
-        const pos = row.position || (idx + 1);
-        const posClass = pos <= 4 ? 'top' : (pos >= table.length - 2 ? 'bottom' : '');
-        const crest = row.team?.crest ? `<img src="${row.team.crest}" alt="" onerror="this.style.display='none'">` : '';
-        return `<tr><td class="pos ${posClass}">${pos}</td><td><div class="team-cell">${crest}${row.team?.shortName || row.team?.name || '—'}</div></td>
-          <td>${row.playedGames ?? '—'}</td><td>${row.won ?? '—'}</td><td>${row.draw ?? '—'}</td><td>${row.lost ?? '—'}</td>
-          <td>${row.goalsFor ?? '—'}</td><td>${row.goalsAgainst ?? '—'}</td><td>${row.goalDifference ?? '—'}</td>
-          <td><strong>${row.points ?? '—'}</strong></td></tr>`;
-      }).join('');
-      container.innerHTML = `<div class="table-wrap"><table><thead><tr><th>#</th><th>Time</th><th>J</th><th>V</th><th>E</th><th>D</th><th>GP</th><th>GC</th><th>SG</th><th>Pts</th></tr></thead><tbody>${rows}</tbody></table></div>
-        <p style="margin-top:12px;font-size:0.8rem;color:var(--text-muted)">Fonte: football-data.org · Escudos oficiais</p>`;
-    }
-    function renderAFTable(table, container) {
-      const rows = table.map((row, idx) => {
-        const pos = row.rank || (idx + 1);
-        const posClass = pos <= 4 ? 'top' : (pos >= table.length - 2 ? 'bottom' : '');
-        const logo = row.team?.logo ? `<img src="${row.team.logo}" alt="" onerror="this.style.display='none'">` : '';
-        return `<tr><td class="pos ${posClass}">${pos}</td><td><div class="team-cell">${logo}${row.team?.name || '—'}</div></td>
-          <td>${row.all?.played ?? '—'}</td><td>${row.all?.win ?? '—'}</td><td>${row.all?.draw ?? '—'}</td><td>${row.all?.lose ?? '—'}</td>
-          <td>${row.all?.goals?.for ?? '—'}</td><td>${row.all?.goals?.against ?? '—'}</td><td>${row.goalsDiff ?? '—'}</td>
-          <td><strong>${row.points ?? '—'}</strong></td></tr>`;
-      }).join('');
-      container.innerHTML = `<div class="table-wrap"><table><thead><tr><th>#</th><th>Time</th><th>J</th><th>V</th><th>E</th><th>D</th><th>GP</th><th>GC</th><th>SG</th><th>Pts</th></tr></thead><tbody>${rows}</tbody></table></div>
-        <p style="margin-top:12px;font-size:0.8rem;color:var(--text-muted)">Fonte: API-Football · Ligas asiáticas</p>`;
-    }
-    function renderWCTable(entries, container) {
-      const rows = entries.map((e, idx) => {
-        const stats = {};
-        (e.stats || []).forEach(s => { stats[s.name] = s.displayValue; });
-        const pos = stats.rank || (idx + 1);
-        const posClass = pos <= 4 ? 'top' : (pos >= entries.length - 2 ? 'bottom' : '');
-        const logo = e.team?.logo ? `<img src="${e.team.logo}" alt="" onerror="this.style.display='none'">` : '';
-        return `<tr><td class="pos ${posClass}">${pos}</td><td><div class="team-cell">${logo}${e.team?.displayName || e.team?.name || '—'}</div></td>
-          <td>${stats.gamesPlayed || '—'}</td><td>${stats.wins || '—'}</td><td>${stats.ties || '—'}</td><td>${stats.losses || '—'}</td>
-          <td>${stats.pointsFor || '—'}</td><td>${stats.pointsAgainst || '—'}</td><td>${stats.pointDifferential || '—'}</td>
-          <td><strong>${stats.points || '—'}</strong></td></tr>`;
-      }).join('');
-      container.innerHTML = `<div class="table-wrap"><table><thead><tr><th>#</th><th>Time</th><th>J</th><th>V</th><th>E</th><th>D</th><th>GP</th><th>GC</th><th>SG</th><th>Pts</th></tr></thead><tbody>${rows}</tbody></table></div>
-        <p style="margin-top:12px;font-size:0.8rem;color:var(--text-muted)">Fonte: Free API</p>`;
-    }
-
-    async function loadHistory() {
-      const id = document.getElementById('histLeague').value;
-      const league = findLeague(id);
-      const container = document.getElementById('histContent');
-      if (!league) { container.innerHTML = `<div class="empty">Selecione um campeonato.</div>`; return; }
-      container.innerHTML = `<div class="loading"><div class="spinner"></div>Carregando resultados...</div>`;
-
-      try {
-        let events = [];
-        if (league.source === 'fd') {
-          const data = await fetchFD(`/competitions/${league.code}/matches?status=FINISHED&limit=40`);
-          events = (data.matches || []).sort((a, b) => new Date(b.utcDate) - new Date(a.utcDate)).slice(0, 30).map(normalizeFDMatch);
-        } else if (league.source === 'af') {
-          const data = await fetchAF(`/fixtures?league=${league.afId}&season=${league.season}&status=FT&last=30`);
-          events = (data.response || []).map(normalizeAFMatch);
-        } else if (league.source === 'ol') {
-          const data = await fetchOL(`/getmatchdata/${league.shortcut}/${league.season}`);
-          events = (Array.isArray(data) ? data : []).filter(m => m.matchIsFinished)
-            .sort((a, b) => new Date(b.matchDateTimeUTC || b.matchDateTime) - new Date(a.matchDateTimeUTC || a.matchDateTime))
-            .slice(0, 30).map(normalizeOLMatch);
-        } else {
-          const dates = [];
-          for (let i = 1; i <= 10; i++) { const d = new Date(); d.setDate(d.getDate() - i); dates.push(d.toISOString().slice(0, 10).replace(/-/g, '')); }
-          const results = await Promise.allSettled(dates.map(dt => fetchWC(`/${league.slug}/scoreboard?dates=${dt}`)));
-          results.forEach(r => {
-            if (r.status !== 'fulfilled') return;
-            const d = r.value;
-            let evs = d.events || d.leagues?.[0]?.events || [];
-            if (!evs.length && d.leagues) evs = d.leagues.flatMap(lg => lg.events || []);
-            events.push(...evs.map(normalizeWCEvent).filter(e => e.isFT));
-          });
-          events = events.slice(0, 30);
-        }
-        if (!events.length) { container.innerHTML = `<div class="empty">Nenhum resultado recente.</div>`; return; }
-        renderMatchGroups([{ name: league.name, source: league.source, events }], 'histContent', null);
-      } catch (err) {
-        container.innerHTML = `<div class="empty">Erro: ${err.message}</div>`;
-      }
-    }
-
-    async function loadMeta() {
-      const parts = [];
-      try {
-        const meta = await fetchWC('/meta');
-        const cov = meta.coverage || {};
-        parts.push(`
-          <div class="stats-grid">
-            <div class="stat-card"><div class="stat-value">${cov.competitions || '—'}</div><div class="stat-label">Free API</div></div>
-            <div class="stat-card"><div class="stat-value">${getFdKey() ? FD_COMPS.length : 0}</div><div class="stat-label">football-data</div></div>
-            <div class="stat-card"><div class="stat-value">${OL_COMPS.length}</div><div class="stat-label">OpenLigaDB</div></div>
-            <div class="stat-card"><div class="stat-value">${getAfKey() ? AF_ASIA_COMPS.length : 0}</div><div class="stat-label">Ásia (API-Football)</div></div>
-            <div class="stat-card"><div class="stat-value">${leagues.length}</div><div class="stat-label">Total no app</div></div>
-            <div class="stat-card"><div class="stat-value">${getAfKey() ? 'Sim' : 'Não'}</div><div class="stat-label">Chave Ásia</div></div>
-          </div>
-          <div class="card">
-            <p><strong>Ligas asiáticas:</strong> ${getAfKey()
-              ? 'Ativas — J1, J2, K League 1/2, CSL, Saudi Pro, A-League, AFC CL Elite/Two, Thai League, ISL'
-              : 'Desativadas. Adicione chave API-Football em Config.'}</p>
-          </div>`);
-      } catch (e) {
-        parts.push(`<div class="empty">Metadados indisponíveis.</div>`);
-      }
-      document.getElementById('statsContent').innerHTML = parts.join('');
-    }
-
-    function startAutoRefresh() {
-      if (autoRefreshTimer) clearInterval(autoRefreshTimer);
-      autoRefreshTimer = setInterval(() => {
-        if (document.getElementById('hoje').classList.contains('active')) loadToday();
-      }, 45000);
-    }
-
-    document.getElementById('fdKey').value = getFdKey();
-    document.getElementById('afKey').value = getAfKey();
-    setKeyStatus(localStorage.getItem('fd_api_key') ? 'Chave FD do navegador.' : 'Chave FD padrão ativa.', true);
-    setAfKeyStatus(localStorage.getItem('af_api_key') ? 'Chave API-Football do navegador ativa.' : 'Chave API-Football padrão do código ativa.', true);
-    initLeagues();
-    startAutoRefresh();
-  
+function startAuto(){if(timer)clearInterval(timer);timer=setInterval(()=>{if(document.getElementById('hoje').classList.contains('active'))loadToday()},45000)}
+document.getElementById('fdKey').value=getFd();
+document.getElementById('afKey').value=getAf();
+setKS(localStorage.getItem('fd_api_key')?'FD do navegador.':'FD padrão.',true);
+setAKS(getAf()?'AF ativa.':'Sem AF — SA extra desativada.',!!getAf());
+init();startAuto();
 </script>
 </body>
 </html>
