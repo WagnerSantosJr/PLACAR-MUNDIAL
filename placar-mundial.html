@@ -1,0 +1,911 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>PLACAR MUNDIAL — Jogos, Tabelas e Estatísticas ao Vivo</title>
+  <meta name="description" content="PLACAR MUNDIAL: jogos de hoje e amanhã, tabelas, ligas europeias, brasileiras e asiáticas (J1, K League, CSL, Saudi, A-League, AFC)." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      --bg: #0b1220; --bg-card: #121a2b; --bg-elevated: #1a2438; --border: #243047;
+      --text: #e8eef9; --text-muted: #8b9bb8; --accent: #00c853; --accent-dim: #00a844;
+      --live: #ff3d00; --radius: 14px; --shadow: 0 8px 32px rgba(0,0,0,.35);
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    html { scroll-behavior: smooth; }
+    body { font-family: 'Inter', system-ui, sans-serif; background: var(--bg); color: var(--text); min-height: 100vh; line-height: 1.5; }
+    header { position: sticky; top: 0; z-index: 100; background: rgba(11,18,32,.92); backdrop-filter: blur(12px); border-bottom: 1px solid var(--border); padding: 12px 16px; }
+    .header-inner { max-width: 1200px; margin: 0 auto; display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap; }
+    .logo { display: flex; align-items: center; gap: 10px; font-weight: 800; font-size: 1.25rem; letter-spacing: -0.02em; }
+    .logo-icon { width: 40px; height: 40px; background: linear-gradient(135deg, var(--accent), #00e676); border-radius: 12px; display: grid; place-items: center; font-size: 1.35rem; box-shadow: 0 4px 14px rgba(0,200,83,.35); }
+    .status { display: flex; align-items: center; gap: 8px; font-size: 0.8rem; color: var(--text-muted); }
+    .dot { width: 8px; height: 8px; border-radius: 50%; background: var(--accent); animation: pulse 1.5s infinite; }
+    @keyframes pulse { 0%,100%{opacity:1;transform:scale(1)} 50%{opacity:.5;transform:scale(.85)} }
+    nav { max-width: 1200px; margin: 0 auto; padding: 12px 16px 0; display: flex; gap: 6px; overflow-x: auto; scrollbar-width: none; }
+    nav::-webkit-scrollbar { display: none; }
+    .nav-btn { flex-shrink: 0; background: transparent; border: 1px solid transparent; color: var(--text-muted); padding: 10px 16px; border-radius: 999px; font-weight: 600; font-size: 0.9rem; cursor: pointer; transition: all .2s; }
+    .nav-btn:hover { color: var(--text); background: var(--bg-elevated); }
+    .nav-btn.active { background: var(--accent); color: #041208; border-color: var(--accent); }
+    main { max-width: 1200px; margin: 0 auto; padding: 20px 16px 80px; }
+    .section { display: none; animation: fadeIn .3s ease; }
+    .section.active { display: block; }
+    @keyframes fadeIn { from{opacity:0;transform:translateY(8px)} to{opacity:1;transform:none} }
+    h2 { font-size: 1.35rem; font-weight: 700; margin-bottom: 16px; display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+    h2 .badge { font-size: 0.75rem; background: var(--bg-elevated); color: var(--text-muted); padding: 3px 10px; border-radius: 999px; font-weight: 600; }
+    .filters { display: flex; flex-wrap: wrap; gap: 10px; margin-bottom: 20px; align-items: center; }
+    select, .btn, input[type="text"] { background: var(--bg-card); border: 1px solid var(--border); color: var(--text); padding: 10px 14px; border-radius: 10px; font-size: 0.9rem; font-weight: 500; outline: none; }
+    select:focus, .btn:hover, input:focus { border-color: var(--accent); }
+    .btn { cursor: pointer; }
+    .btn-primary { background: var(--accent); color: #041208; border-color: var(--accent); font-weight: 700; }
+    .btn-primary:hover { background: var(--accent-dim); }
+    .btn-outline { background: transparent; }
+    .card { background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius); padding: 16px; margin-bottom: 12px; box-shadow: var(--shadow); }
+    .league-header { display: flex; align-items: center; gap: 10px; margin-bottom: 12px; padding-bottom: 10px; border-bottom: 1px solid var(--border); font-weight: 700; font-size: 0.95rem; }
+    .src-tag { font-size: 0.65rem; padding: 2px 7px; border-radius: 6px; font-weight: 700; background: var(--bg-elevated); color: var(--text-muted); margin-left: auto; }
+    .src-tag.fd { background: rgba(79,195,247,.15); color: #4fc3f7; }
+    .src-tag.wc { background: rgba(0,200,83,.12); color: var(--accent); }
+    .src-tag.ol { background: rgba(255,193,7,.12); color: #ffc107; }
+    .src-tag.af { background: rgba(233,30,99,.15); color: #f48fb1; }
+    .match { display: grid; grid-template-columns: 1fr auto 1fr; gap: 12px; align-items: center; padding: 14px 0; border-bottom: 1px solid rgba(36,48,71,.6); }
+    .match:last-child { border-bottom: none; }
+    .team { display: flex; align-items: center; gap: 10px; min-width: 0; }
+    .team.home { justify-content: flex-end; text-align: right; }
+    .team.away { justify-content: flex-start; }
+    .team-name { font-weight: 600; font-size: 0.95rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .team img, .crest { width: 32px; height: 32px; object-fit: contain; flex-shrink: 0; border-radius: 4px; background: rgba(255,255,255,.04); }
+    .score-box { display: flex; flex-direction: column; align-items: center; gap: 4px; min-width: 78px; }
+    .score { font-size: 1.45rem; font-weight: 800; letter-spacing: 0.05em; font-variant-numeric: tabular-nums; }
+    .score.live { color: var(--live); }
+    .status-badge { font-size: 0.7rem; font-weight: 700; padding: 2px 8px; border-radius: 6px; text-transform: uppercase; }
+    .status-badge.live { background: rgba(255,61,0,.15); color: var(--live); }
+    .status-badge.ft { background: rgba(0,200,83,.12); color: var(--accent); }
+    .status-badge.ns { background: var(--bg-elevated); color: var(--text-muted); }
+    .table-wrap { overflow-x: auto; border-radius: var(--radius); border: 1px solid var(--border); }
+    table { width: 100%; border-collapse: collapse; font-size: 0.9rem; }
+    th { background: var(--bg-elevated); text-align: left; padding: 12px 10px; font-weight: 600; color: var(--text-muted); white-space: nowrap; }
+    td { padding: 11px 10px; border-top: 1px solid var(--border); white-space: nowrap; }
+    tr:hover td { background: rgba(255,255,255,.02); }
+    .pos { font-weight: 700; width: 36px; text-align: center; }
+    .pos.top { color: var(--accent); }
+    .pos.bottom { color: var(--live); }
+    .team-cell { display: flex; align-items: center; gap: 10px; font-weight: 600; }
+    .team-cell img { width: 26px; height: 26px; object-fit: contain; border-radius: 3px; }
+    .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 14px; }
+    .league-card { background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius); padding: 18px; cursor: pointer; transition: all .2s; }
+    .league-card:hover { border-color: var(--accent); transform: translateY(-2px); box-shadow: var(--shadow); }
+    .league-card h3 { font-size: 1.05rem; margin-bottom: 4px; }
+    .league-card p { color: var(--text-muted); font-size: 0.85rem; }
+    .loading { text-align: center; padding: 48px 20px; color: var(--text-muted); }
+    .spinner { width: 40px; height: 40px; border: 3px solid var(--border); border-top-color: var(--accent); border-radius: 50%; margin: 0 auto 16px; animation: spin .8s linear infinite; }
+    @keyframes spin { to { transform: rotate(360deg); } }
+    .empty { text-align: center; padding: 40px 20px; color: var(--text-muted); background: var(--bg-card); border-radius: var(--radius); border: 1px dashed var(--border); }
+    .stats-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); gap: 12px; margin-bottom: 24px; }
+    .stat-card { background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius); padding: 16px; text-align: center; }
+    .stat-value { font-size: 1.8rem; font-weight: 800; color: var(--accent); line-height: 1.1; }
+    .stat-label { font-size: 0.8rem; color: var(--text-muted); margin-top: 4px; }
+    .settings-box { background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius); padding: 20px; margin-bottom: 20px; }
+    .settings-box label { display: block; font-weight: 600; margin-bottom: 8px; font-size: 0.9rem; }
+    .settings-box input { width: 100%; max-width: 420px; margin-bottom: 10px; }
+    .settings-box .hint { font-size: 0.8rem; color: var(--text-muted); margin-top: 8px; line-height: 1.5; }
+    .settings-box a { color: var(--accent); }
+    .key-status { display: inline-flex; align-items: center; gap: 6px; font-size: 0.85rem; margin-top: 8px; }
+    .key-status.ok { color: var(--accent); }
+    .key-status.err { color: var(--live); }
+    footer { text-align: center; padding: 24px 16px; color: var(--text-muted); font-size: 0.8rem; border-top: 1px solid var(--border); }
+    footer a { color: var(--accent); text-decoration: none; }
+    @media (max-width: 600px) {
+      .team-name { font-size: 0.85rem; }
+      .score { font-size: 1.2rem; }
+      .match { gap: 8px; }
+      .team img, .crest { width: 26px; height: 26px; }
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <div class="header-inner">
+      <div class="logo">
+        <div class="logo-icon">⚽</div>
+        <span>PLACAR MUNDIAL</span>
+      </div>
+      <div class="status">
+        <span class="dot" id="statusDot"></span>
+        <span id="lastUpdate">Atualizando...</span>
+      </div>
+    </div>
+  </header>
+
+  <nav id="nav">
+    <button class="nav-btn active" data-section="hoje">Hoje</button>
+    <button class="nav-btn" data-section="amanha">Amanhã</button>
+    <button class="nav-btn" data-section="tabelas">Tabelas</button>
+    <button class="nav-btn" data-section="campeonatos">Campeonatos</button>
+    <button class="nav-btn" data-section="historico">Histórico</button>
+    <button class="nav-btn" data-section="stats">Estatísticas</button>
+    <button class="nav-btn" data-section="config">Config</button>
+  </nav>
+
+  <main>
+    <section id="hoje" class="section active">
+      <h2>Jogos de Hoje <span class="badge" id="hojeBadge">—</span></h2>
+      <div class="filters">
+        <select id="hojeLeague"><option value="all">Todos os campeonatos</option></select>
+        <button class="btn btn-primary" onclick="loadToday()">Atualizar</button>
+      </div>
+      <div id="hojeContent" class="loading"><div class="spinner"></div>Carregando jogos de hoje...</div>
+    </section>
+
+    <section id="amanha" class="section">
+      <h2>Jogos de Amanhã <span class="badge" id="amanhaBadge">—</span></h2>
+      <div class="filters">
+        <select id="amanhaLeague"><option value="all">Todos os campeonatos</option></select>
+        <button class="btn btn-primary" onclick="loadTomorrow()">Atualizar</button>
+      </div>
+      <div id="amanhaContent" class="loading"><div class="spinner"></div>Carregando jogos de amanhã...</div>
+    </section>
+
+    <section id="tabelas" class="section">
+      <h2>Tabelas / Classificações <span class="badge">Atualizadas</span></h2>
+      <div class="filters">
+        <select id="tabelaLeague"></select>
+        <button class="btn btn-primary" onclick="loadStandings()">Carregar tabela</button>
+      </div>
+      <div id="tabelaContent" class="empty">Selecione um campeonato para ver a tabela atualizada.</div>
+    </section>
+
+    <section id="campeonatos" class="section">
+      <h2>Todos os Campeonatos <span class="badge" id="campeonatosBadge">—</span></h2>
+      <div id="campeonatosContent" class="loading"><div class="spinner"></div>Carregando...</div>
+    </section>
+
+    <section id="historico" class="section">
+      <h2>Histórico / Resultados Recentes</h2>
+      <div class="filters">
+        <select id="histLeague"></select>
+        <button class="btn btn-primary" onclick="loadHistory()">Buscar resultados</button>
+      </div>
+      <div id="histContent" class="empty">Selecione um campeonato para ver resultados recentes.</div>
+    </section>
+
+    <section id="stats" class="section">
+      <h2>Estatísticas Gerais</h2>
+      <div id="statsContent" class="loading"><div class="spinner"></div>Carregando metadados...</div>
+    </section>
+
+    <section id="config" class="section">
+      <h2>Configurações das APIs</h2>
+
+      <div class="settings-box">
+        <label for="fdKey">Chave football-data.org (gratuita — Europa + Brasil)</label>
+        <input type="text" id="fdKey" placeholder="Cole sua chave FD" autocomplete="off" />
+        <div style="display:flex;gap:10px;flex-wrap:wrap;">
+          <button class="btn btn-primary" onclick="saveFdKey()">Salvar</button>
+          <button class="btn btn-outline" onclick="clearFdKey()">Remover</button>
+          <button class="btn btn-outline" onclick="testFdKey()">Testar</button>
+        </div>
+        <div id="keyStatus" class="key-status"></div>
+        <p class="hint">
+          Cadastro: <a href="https://www.football-data.org/client/register" target="_blank" rel="noopener">football-data.org/client/register</a>
+        </p>
+      </div>
+
+      <div class="settings-box">
+        <label for="afKey">Chave API-Football / API-Sports (gratuita — ligas asiáticas e +1000 ligas)</label>
+        <input type="text" id="afKey" placeholder="Cole sua chave API-Football (x-apisports-key)" autocomplete="off" />
+        <div style="display:flex;gap:10px;flex-wrap:wrap;">
+          <button class="btn btn-primary" onclick="saveAfKey()">Salvar</button>
+          <button class="btn btn-outline" onclick="clearAfKey()">Remover</button>
+          <button class="btn btn-outline" onclick="testAfKey()">Testar</button>
+        </div>
+        <div id="afKeyStatus" class="key-status"></div>
+        <p class="hint">
+          1. Acesse <a href="https://www.api-football.com/" target="_blank" rel="noopener">api-football.com</a> ou RapidAPI<br>
+          2. Crie conta gratuita (100 requisições/dia no plano free)<br>
+          3. Cole a chave aqui e salve<br><br>
+          <strong>Ligas asiáticas liberadas com a chave:</strong><br>
+          J1 League (Japão) · K League 1 (Coreia) · Chinese Super League · Saudi Pro League ·
+          A-League (Austrália) · AFC Champions League Elite · AFC Champions League Two
+        </p>
+      </div>
+
+      <div class="settings-box">
+        <p class="hint" style="margin:0">
+          <strong>Fontes sempre ativas (sem chave extra):</strong><br>
+          • Free Football API — Inglaterra e Espanha<br>
+          • OpenLigaDB — 2. Bundesliga, 3. Liga, DFB-Pokal<br>
+          • football-data.org — com chave padrão embutida (12 ligas principais)
+        </p>
+      </div>
+    </section>
+  </main>
+
+  <footer>
+    <strong>PLACAR MUNDIAL</strong> ·
+    football-data.org · Free API · OpenLigaDB · API-Football (Ásia) ·
+    Atualização a cada 45s
+  </footer>
+
+  <script>
+    const WC_API = 'https://worldcup26.ir/get/soccer';
+    const FD_API = 'https://api.football-data.org/v4';
+    const OL_API = 'https://api.openligadb.de';
+    const AF_API = 'https://v3.football.api-sports.io';
+
+    const FD_COMPS = [
+      { code: 'PL',  name: 'Premier League', country: 'England', type: 'league' },
+      { code: 'PD',  name: 'La Liga', country: 'Spain', type: 'league' },
+      { code: 'BL1', name: 'Bundesliga', country: 'Germany', type: 'league' },
+      { code: 'SA',  name: 'Serie A', country: 'Italy', type: 'league' },
+      { code: 'FL1', name: 'Ligue 1', country: 'France', type: 'league' },
+      { code: 'CL',  name: 'UEFA Champions League', country: 'Europe', type: 'cup' },
+      { code: 'DED', name: 'Eredivisie', country: 'Netherlands', type: 'league' },
+      { code: 'PPL', name: 'Primeira Liga', country: 'Portugal', type: 'league' },
+      { code: 'ELC', name: 'Championship', country: 'England', type: 'league' },
+      { code: 'BSA', name: 'Campeonato Brasileiro Série A', country: 'Brazil', type: 'league' },
+      { code: 'WC',  name: 'FIFA World Cup', country: 'World', type: 'cup' },
+      { code: 'EC',  name: 'UEFA European Championship', country: 'Europe', type: 'cup' },
+    ];
+
+    const OL_COMPS = [
+      { shortcut: 'bl2', season: 2026, name: '2. Bundesliga', country: 'Germany', type: 'league' },
+      { shortcut: 'bl3', season: 2026, name: '3. Liga', country: 'Germany', type: 'league' },
+      { shortcut: 'dfb', season: 2026, name: 'DFB-Pokal', country: 'Germany', type: 'cup' },
+    ];
+
+    // Ligas asiáticas + Oceania via API-Football (IDs estáveis)
+    const AF_ASIA_COMPS = [
+      { id: 98,  name: 'J1 League', country: 'Japan', type: 'league', season: 2026 },
+      { id: 99,  name: 'J2 League', country: 'Japan', type: 'league', season: 2026 },
+      { id: 292, name: 'K League 1', country: 'South Korea', type: 'league', season: 2026 },
+      { id: 293, name: 'K League 2', country: 'South Korea', type: 'league', season: 2026 },
+      { id: 169, name: 'Chinese Super League', country: 'China', type: 'league', season: 2026 },
+      { id: 307, name: 'Saudi Pro League', country: 'Saudi Arabia', type: 'league', season: 2026 },
+      { id: 188, name: 'A-League Men', country: 'Australia', type: 'league', season: 2026 },
+      { id: 17,  name: 'AFC Champions League Elite', country: 'Asia', type: 'cup', season: 2026 },
+      { id: 18,  name: 'AFC Champions League Two', country: 'Asia', type: 'cup', season: 2026 },
+      { id: 296, name: 'Thai League 1', country: 'Thailand', type: 'league', season: 2026 },
+      { id: 274, name: 'Indian Super League', country: 'India', type: 'league', season: 2026 },
+    ];
+
+    let leagues = [];
+    let autoRefreshTimer = null;
+    const DEFAULT_FD_KEY = '28a0d62e9b3c44e5a0d9d75e628abda3';
+    // Chave API-Football (plano free) — embutida no código
+    const DEFAULT_AF_KEY = '646eb40afcfa4369ea0c809faella579';
+
+    function getFdKey() { return localStorage.getItem('fd_api_key') || DEFAULT_FD_KEY; }
+    function getAfKey() { return localStorage.getItem('af_api_key') || DEFAULT_AF_KEY; }
+
+    function saveFdKey() {
+      const key = document.getElementById('fdKey').value.trim();
+      if (!key) { setKeyStatus('Informe a chave FD.', false); return; }
+      localStorage.setItem('fd_api_key', key);
+      setKeyStatus('Chave FD salva!', true);
+      initLeagues();
+    }
+    function clearFdKey() {
+      localStorage.removeItem('fd_api_key');
+      document.getElementById('fdKey').value = DEFAULT_FD_KEY;
+      setKeyStatus('Usando chave FD padrão.', true);
+      initLeagues();
+    }
+    async function testFdKey() {
+      const key = document.getElementById('fdKey').value.trim() || getFdKey();
+      setKeyStatus('Testando FD...', true);
+      try {
+        const res = await fetch(`${FD_API}/competitions/PL`, { headers: { 'X-Auth-Token': key } });
+        if (res.ok) { setKeyStatus('Chave FD válida!', true); localStorage.setItem('fd_api_key', key); }
+        else setKeyStatus('FD inválida (HTTP ' + res.status + ').', false);
+      } catch (e) { setKeyStatus('Erro: ' + e.message, false); }
+    }
+    function setKeyStatus(msg, ok) {
+      const el = document.getElementById('keyStatus');
+      el.textContent = msg;
+      el.className = 'key-status ' + (ok ? 'ok' : 'err');
+    }
+
+    function saveAfKey() {
+      const key = document.getElementById('afKey').value.trim();
+      if (!key) { setAfKeyStatus('Informe a chave API-Football.', false); return; }
+      localStorage.setItem('af_api_key', key);
+      setAfKeyStatus('Chave API-Football salva! Ligas asiáticas ativadas.', true);
+      initLeagues();
+    }
+    function clearAfKey() {
+      localStorage.removeItem('af_api_key');
+      document.getElementById('afKey').value = DEFAULT_AF_KEY;
+      setAfKeyStatus('Chave personalizada removida. Usando chave padrão do código.', true);
+      initLeagues();
+    }
+    async function testAfKey() {
+      const key = document.getElementById('afKey').value.trim() || getAfKey();
+      if (!key) { setAfKeyStatus('Nenhuma chave para testar.', false); return; }
+      setAfKeyStatus('Testando API-Football...', true);
+      try {
+        const res = await fetch(`${AF_API}/status`, { headers: { 'x-apisports-key': key } });
+        const data = await res.json();
+        if (res.ok && data?.response) {
+          setAfKeyStatus('Chave válida! Plano: ' + (data.response.subscription?.plan || 'free'), true);
+          localStorage.setItem('af_api_key', key);
+        } else {
+          setAfKeyStatus('Chave inválida ou limite atingido.', false);
+        }
+      } catch (e) { setAfKeyStatus('Erro: ' + e.message, false); }
+    }
+    function setAfKeyStatus(msg, ok) {
+      const el = document.getElementById('afKeyStatus');
+      el.textContent = msg;
+      el.className = 'key-status ' + (ok ? 'ok' : 'err');
+    }
+
+    function todayISO() { return new Date().toISOString().slice(0, 10); }
+    function tomorrowISO() { const d = new Date(); d.setDate(d.getDate() + 1); return d.toISOString().slice(0, 10); }
+    function todayCompact() { return todayISO().replace(/-/g, ''); }
+    function tomorrowCompact() { return tomorrowISO().replace(/-/g, ''); }
+    function formatTime(iso) {
+      if (!iso) return '—';
+      return new Date(iso).toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' });
+    }
+    function updateStatus() {
+      const now = new Date();
+      document.getElementById('lastUpdate').textContent =
+        `Atualizado às ${now.toLocaleTimeString('pt-BR', { hour:'2-digit', minute:'2-digit', second:'2-digit' })}`;
+    }
+
+    document.getElementById('nav').addEventListener('click', (e) => {
+      const btn = e.target.closest('.nav-btn');
+      if (!btn) return;
+      document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
+      document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+      btn.classList.add('active');
+      document.getElementById(btn.dataset.section).classList.add('active');
+      if (btn.dataset.section === 'config') {
+        document.getElementById('fdKey').value = getFdKey();
+        document.getElementById('afKey').value = getAfKey();
+        setKeyStatus(localStorage.getItem('fd_api_key') ? 'Chave FD do navegador.' : 'Chave FD padrão ativa.', true);
+        setAfKeyStatus(localStorage.getItem('af_api_key') ? 'Chave API-Football do navegador ativa — ligas asiáticas disponíveis.' : 'Chave API-Football padrão do código ativa — ligas asiáticas disponíveis.', true);
+      }
+    });
+
+    async function fetchWC(path) {
+      const res = await fetch(`${WC_API}${path}`);
+      if (!res.ok) throw new Error(`WC HTTP ${res.status}`);
+      return res.json();
+    }
+    async function fetchFD(path) {
+      const key = getFdKey();
+      if (!key) throw new Error('Sem chave FD');
+      const res = await fetch(`${FD_API}${path}`, { headers: { 'X-Auth-Token': key } });
+      if (!res.ok) throw new Error(`FD HTTP ${res.status}`);
+      return res.json();
+    }
+    async function fetchOL(path) {
+      const res = await fetch(`${OL_API}${path}`);
+      if (!res.ok) throw new Error(`OL HTTP ${res.status}`);
+      return res.json();
+    }
+    async function fetchAF(path) {
+      const key = getAfKey();
+      if (!key) throw new Error('Sem chave API-Football');
+      const res = await fetch(`${AF_API}${path}`, { headers: { 'x-apisports-key': key } });
+      if (!res.ok) throw new Error(`AF HTTP ${res.status}`);
+      return res.json();
+    }
+
+    async function initLeagues() {
+      leagues = [];
+
+      try {
+        const data = await fetchWC('/leagues?kind=club&available=true');
+        (data.leagues || []).forEach(l => {
+          leagues.push({
+            id: 'wc_' + l.slug, name: l.name, country: l.country || '', source: 'wc',
+            slug: l.slug, season: l.season?.display_name || '', matches: l.coverage?.matches || 0,
+          });
+        });
+      } catch (e) { console.warn('WC', e); }
+
+      if (getFdKey()) {
+        FD_COMPS.forEach(c => {
+          leagues.push({ id: 'fd_' + c.code, name: c.name, country: c.country, source: 'fd', code: c.code, type: c.type });
+        });
+      }
+
+      OL_COMPS.forEach(c => {
+        leagues.push({
+          id: 'ol_' + c.shortcut, name: c.name, country: c.country, source: 'ol',
+          shortcut: c.shortcut, season: c.season, type: c.type,
+        });
+      });
+
+      // Ligas asiáticas (só se houver chave API-Football)
+      if (getAfKey()) {
+        AF_ASIA_COMPS.forEach(c => {
+          leagues.push({
+            id: 'af_' + c.id, name: c.name, country: c.country, source: 'af',
+            afId: c.id, season: c.season, type: c.type,
+          });
+        });
+      }
+
+      const priority = [
+        'Premier League', 'La Liga', 'Bundesliga', 'Serie A', 'Ligue 1',
+        'UEFA Champions League', 'Campeonato Brasileiro Série A',
+        'J1 League', 'K League 1', 'Chinese Super League', 'Saudi Pro League',
+        'A-League Men', 'AFC Champions League Elite',
+        '2. Bundesliga', '3. Liga', 'Championship'
+      ];
+      leagues.sort((a, b) => {
+        const pa = priority.indexOf(a.name);
+        const pb = priority.indexOf(b.name);
+        if (pa !== -1 || pb !== -1) return (pa === -1 ? 99 : pa) - (pb === -1 ? 99 : pb);
+        return a.name.localeCompare(b.name);
+      });
+
+      populateSelects();
+      renderCampeonatos();
+      loadMeta();
+      loadToday();
+      loadTomorrow();
+    }
+
+    function populateSelects() {
+      const opts = leagues.map(l => {
+        const tag = { fd: ' [FD]', wc: ' [Free]', ol: ' [OL]', af: ' [Ásia]' }[l.source] || '';
+        return `<option value="${l.id}">${l.name} (${l.country})${tag}</option>`;
+      }).join('');
+      ['hojeLeague', 'amanhaLeague'].forEach(id => {
+        document.getElementById(id).innerHTML = `<option value="all">Todos os campeonatos</option>` + opts;
+      });
+      ['tabelaLeague', 'histLeague'].forEach(id => {
+        document.getElementById(id).innerHTML = opts;
+        if (leagues.length) {
+          const preferred = leagues.find(l => l.id === 'fd_PL') || leagues[0];
+          document.getElementById(id).value = preferred.id;
+        }
+      });
+    }
+
+    function renderCampeonatos() {
+      const container = document.getElementById('campeonatosContent');
+      document.getElementById('campeonatosBadge').textContent = leagues.length + ' ligas';
+      if (!leagues.length) {
+        container.innerHTML = `<div class="empty">Nenhum campeonato disponível.</div>`;
+        return;
+      }
+      const srcLabel = { fd: 'football-data.org', wc: 'Free API', ol: 'OpenLigaDB', af: 'API-Football · Ásia' };
+      container.innerHTML = `<div class="grid">${leagues.map(l => `
+        <div class="league-card" onclick="selectLeague('${l.id}')">
+          <h3>${l.name}</h3>
+          <p>${l.country}${l.season ? ' · ' + l.season : ''}</p>
+          <p style="margin-top:8px;font-size:0.8rem;">
+            <span class="src-tag ${l.source}">${srcLabel[l.source] || l.source}</span>
+            ${l.source === 'fd' ? ' · Escudos oficiais' : ''}
+            ${l.source === 'af' ? ' · Ásia/Oceania' : ''}
+          </p>
+        </div>
+      `).join('')}</div>
+`;
+    }
+
+    function selectLeague(id) {
+      document.getElementById('tabelaLeague').value = id;
+      document.getElementById('histLeague').value = id;
+      document.querySelector('[data-section="tabelas"]').click();
+      loadStandings();
+    }
+    function findLeague(id) { return leagues.find(l => l.id === id); }
+
+    function renderMatchGroups(groups, containerId, badgeId) {
+      const container = document.getElementById(containerId);
+      if (!groups || !groups.length) {
+        container.innerHTML = `<div class="empty">Nenhum jogo encontrado para esta data.</div>`;
+        if (badgeId) document.getElementById(badgeId).textContent = '0 jogos';
+        return;
+      }
+      let total = 0;
+      let html = '';
+      const srcLabel = { fd: 'FD · Escudos oficiais', wc: 'Free', ol: 'OpenLigaDB', af: 'API-Football · Ásia' };
+      groups.sort((a, b) => {
+        const order = { fd: 0, af: 1, ol: 2, wc: 3 };
+        if (a.source !== b.source) return (order[a.source] ?? 9) - (order[b.source] ?? 9);
+        return (a.name || '').localeCompare(b.name || '');
+      });
+      groups.forEach(g => {
+        const events = g.events || [];
+        if (!events.length) return;
+        total += events.length;
+        html += `<div class="card"><div class="league-header">🏆 ${g.name}
+          <span class="src-tag ${g.source}">${srcLabel[g.source] || g.source}</span></div>`;
+        events.forEach(ev => {
+          const homeLogo = ev.homeLogo ? `<img class="crest" src="${ev.homeLogo}" alt="" onerror="this.style.display='none'">` : '';
+          const awayLogo = ev.awayLogo ? `<img class="crest" src="${ev.awayLogo}" alt="" onerror="this.style.display='none'">` : '';
+          const isLive = ev.isLive, isFT = ev.isFT;
+          const time = ev.timeLabel || formatTime(ev.date);
+          html += `<div class="match">
+            <div class="team home"><span class="team-name">${ev.homeName || 'Casa'}</span>${homeLogo}</div>
+            <div class="score-box">
+              <div class="score ${isLive ? 'live' : ''}">${(isFT || isLive || ev.homeScore != null) ? `${ev.homeScore ?? '—'} - ${ev.awayScore ?? '—'}` : time}</div>
+              <span class="status-badge ${isLive ? 'live' : isFT ? 'ft' : 'ns'}">${isLive ? (ev.minute ? ev.minute + "'" : 'AO VIVO') : isFT ? 'Encerrado' : time}</span>
+            </div>
+            <div class="team away">${awayLogo}<span class="team-name">${ev.awayName || 'Fora'}</span></div>
+          </div>`;
+        });
+        html += `</div>`;
+      });
+      container.innerHTML = html || `<div class="empty">Nenhum jogo encontrado.</div>`;
+      if (badgeId) document.getElementById(badgeId).textContent = `${total} jogo${total !== 1 ? 's' : ''}`;
+      updateStatus();
+    }
+
+    function normalizeFDMatch(m) {
+      const status = (m.status || '').toUpperCase();
+      const isLive = ['IN_PLAY', 'PAUSED', 'EXTRA_TIME', 'PENALTY_SHOOTOUT'].includes(status);
+      const isFT = status === 'FINISHED' || status === 'AWARDED';
+      return {
+        homeName: m.homeTeam?.shortName || m.homeTeam?.name || 'Casa',
+        awayName: m.awayTeam?.shortName || m.awayTeam?.name || 'Fora',
+        homeLogo: m.homeTeam?.crest || null, awayLogo: m.awayTeam?.crest || null,
+        homeScore: m.score?.fullTime?.home ?? null, awayScore: m.score?.fullTime?.away ?? null,
+        isLive, isFT, date: m.utcDate, timeLabel: formatTime(m.utcDate), minute: m.minute || '',
+      };
+    }
+    function normalizeWCEvent(ev) {
+      const home = ev.competitions?.[0]?.competitors?.find(c => c.homeAway === 'home') || ev.home || ev.teams?.home || {};
+      const away = ev.competitions?.[0]?.competitors?.find(c => c.homeAway === 'away') || ev.away || ev.teams?.away || {};
+      const statusRaw = (ev.status?.type?.name || ev.status || 'scheduled').toLowerCase();
+      const isLive = /in|live|progress/.test(statusRaw);
+      const isFT = /final|ft|full/.test(statusRaw);
+      let homeScore = home.score ?? home.score?.displayValue ?? null;
+      let awayScore = away.score ?? away.score?.displayValue ?? null;
+      if (homeScore === '—') homeScore = null;
+      if (awayScore === '—') awayScore = null;
+      return {
+        homeName: home.team?.displayName || home.team?.name || home.name || 'Casa',
+        awayName: away.team?.displayName || away.team?.name || away.name || 'Fora',
+        homeLogo: home.team?.logo || home.logo || null, awayLogo: away.team?.logo || away.logo || null,
+        homeScore, awayScore, isLive, isFT,
+        date: ev.date || ev.startTime || ev.kickoff,
+        timeLabel: formatTime(ev.date || ev.startTime || ev.kickoff),
+        minute: ev.status?.displayClock || ev.minute || '',
+      };
+    }
+    function normalizeOLMatch(m) {
+      const finished = !!m.matchIsFinished;
+      let homeScore = null, awayScore = null;
+      if (m.matchResults?.length) {
+        const final = m.matchResults.find(r => r.resultTypeID === 2) || m.matchResults[m.matchResults.length - 1];
+        homeScore = final?.pointsTeam1 ?? null;
+        awayScore = final?.pointsTeam2 ?? null;
+      }
+      return {
+        homeName: m.team1?.shortName || m.team1?.teamName || 'Casa',
+        awayName: m.team2?.shortName || m.team2?.teamName || 'Fora',
+        homeLogo: m.team1?.teamIconUrl || null, awayLogo: m.team2?.teamIconUrl || null,
+        homeScore, awayScore, isLive: !finished && homeScore != null, isFT: finished,
+        date: m.matchDateTimeUTC || m.matchDateTime,
+        timeLabel: formatTime(m.matchDateTimeUTC || m.matchDateTime), minute: '',
+      };
+    }
+    function normalizeAFMatch(m) {
+      const st = (m.fixture?.status?.short || '').toUpperCase();
+      const isLive = ['1H', '2H', 'ET', 'BT', 'P', 'LIVE', 'HT'].includes(st);
+      const isFT = ['FT', 'AET', 'PEN'].includes(st);
+      return {
+        homeName: m.teams?.home?.name || 'Casa',
+        awayName: m.teams?.away?.name || 'Fora',
+        homeLogo: m.teams?.home?.logo || null,
+        awayLogo: m.teams?.away?.logo || null,
+        homeScore: m.goals?.home ?? null,
+        awayScore: m.goals?.away ?? null,
+        isLive, isFT,
+        date: m.fixture?.date,
+        timeLabel: formatTime(m.fixture?.date),
+        minute: m.fixture?.status?.elapsed != null ? String(m.fixture.status.elapsed) : '',
+      };
+    }
+
+    async function loadMatchesForDate(dateISO, dateCompact, leagueId, containerId, badgeId) {
+      const container = document.getElementById(containerId);
+      container.innerHTML = `<div class="loading"><div class="spinner"></div>Carregando todos os jogos...</div>`;
+      const groups = [];
+      const seen = new Set();
+
+      try {
+        if (leagueId === 'all') {
+          if (getFdKey()) {
+            try {
+              const data = await fetchFD(`/matches?date=${dateISO}`);
+              const byComp = {};
+              (data.matches || []).forEach(m => {
+                const code = m.competition?.code || 'other';
+                const name = m.competition?.name || code;
+                if (!byComp[code]) byComp[code] = { name, source: 'fd', events: [] };
+                const ev = normalizeFDMatch(m);
+                byComp[code].events.push(ev);
+                seen.add(`${ev.homeName}|${ev.awayName}|${dateISO}`.toLowerCase());
+              });
+              Object.values(byComp).forEach(g => { if (g.events.length) groups.push(g); });
+            } catch (e) { console.warn('FD', e); }
+          }
+
+          // Ásia via API-Football (uma chamada por data cobre várias ligas)
+          if (getAfKey()) {
+            try {
+              const data = await fetchAF(`/fixtures?date=${dateISO}`);
+              const byLeague = {};
+              (data.response || []).forEach(m => {
+                const lid = m.league?.id;
+                const name = m.league?.name || 'Liga';
+                const country = m.league?.country || '';
+                // Filtrar só as que queremos destacar como Ásia + aceitar outras se vierem
+                const isAsia = AF_ASIA_COMPS.some(c => c.id === lid) ||
+                  ['Japan', 'South-Korea', 'China', 'Saudi-Arabia', 'Australia', 'Thailand', 'India', 'Qatar', 'United-Arab-Emirates', 'Indonesia', 'Malaysia', 'Vietnam']
+                    .includes(country);
+                if (!isAsia && !AF_ASIA_COMPS.some(c => c.id === lid)) return;
+                if (!byLeague[lid]) byLeague[lid] = { name: name + (country ? ` (${country})` : ''), source: 'af', events: [] };
+                const ev = normalizeAFMatch(m);
+                const key = `${ev.homeName}|${ev.awayName}|${dateISO}`.toLowerCase();
+                if (seen.has(key)) return;
+                seen.add(key);
+                byLeague[lid].events.push(ev);
+              });
+              Object.values(byLeague).forEach(g => { if (g.events.length) groups.push(g); });
+            } catch (e) { console.warn('AF', e); }
+          }
+
+          for (const ol of OL_COMPS) {
+            try {
+              const data = await fetchOL(`/getmatchdata/${ol.shortcut}/${ol.season}`);
+              const events = (Array.isArray(data) ? data : [])
+                .filter(m => (m.matchDateTimeUTC || m.matchDateTime || '').slice(0, 10) === dateISO)
+                .map(normalizeOLMatch)
+                .filter(ev => {
+                  const key = `${ev.homeName}|${ev.awayName}|${dateISO}`.toLowerCase();
+                  if (seen.has(key)) return false;
+                  seen.add(key);
+                  return true;
+                });
+              if (events.length) groups.push({ name: ol.name, source: 'ol', events });
+            } catch (e) { console.warn('OL', e); }
+          }
+
+          const wcLeagues = leagues.filter(l => l.source === 'wc');
+          const results = await Promise.allSettled(wcLeagues.map(l => fetchWC(`/${l.slug}/scoreboard?dates=${dateCompact}`)));
+          results.forEach((r, i) => {
+            if (r.status !== 'fulfilled') return;
+            const d = r.value;
+            let events = d.events || d.leagues?.[0]?.events || [];
+            if (!events.length && d.leagues) {
+              d.leagues.forEach(lg => {
+                if (lg.events?.length) {
+                  const mapped = lg.events.map(normalizeWCEvent).filter(ev => {
+                    const key = `${ev.homeName}|${ev.awayName}|${dateISO}`.toLowerCase();
+                    if (seen.has(key)) return false;
+                    seen.add(key);
+                    return true;
+                  });
+                  if (mapped.length) groups.push({ name: lg.name || wcLeagues[i].name, source: 'wc', events: mapped });
+                }
+              });
+            } else if (events.length) {
+              const mapped = events.map(normalizeWCEvent).filter(ev => {
+                const key = `${ev.homeName}|${ev.awayName}|${dateISO}`.toLowerCase();
+                if (seen.has(key)) return false;
+                seen.add(key);
+                return true;
+              });
+              if (mapped.length) groups.push({ name: wcLeagues[i].name, source: 'wc', events: mapped });
+            }
+          });
+        } else {
+          const league = findLeague(leagueId);
+          if (!league) throw new Error('Liga não encontrada');
+
+          if (league.source === 'fd') {
+            const data = await fetchFD(`/competitions/${league.code}/matches?dateFrom=${dateISO}&dateTo=${dateISO}`);
+            const events = (data.matches || []).map(normalizeFDMatch);
+            if (events.length) groups.push({ name: league.name, source: 'fd', events });
+          } else if (league.source === 'ol') {
+            const data = await fetchOL(`/getmatchdata/${league.shortcut}/${league.season}`);
+            const events = (Array.isArray(data) ? data : [])
+              .filter(m => (m.matchDateTimeUTC || m.matchDateTime || '').slice(0, 10) === dateISO)
+              .map(normalizeOLMatch);
+            if (events.length) groups.push({ name: league.name, source: 'ol', events });
+          } else if (league.source === 'af') {
+            const data = await fetchAF(`/fixtures?league=${league.afId}&season=${league.season}&date=${dateISO}`);
+            const events = (data.response || []).map(normalizeAFMatch);
+            if (events.length) groups.push({ name: league.name, source: 'af', events });
+          } else {
+            const data = await fetchWC(`/${league.slug}/scoreboard?dates=${dateCompact}`);
+            let events = data.events || data.leagues?.[0]?.events || [];
+            if (!events.length && data.leagues) events = data.leagues.flatMap(lg => lg.events || []);
+            if (events.length) groups.push({ name: league.name, source: 'wc', events: events.map(normalizeWCEvent) });
+          }
+        }
+      } catch (err) {
+        console.error(err);
+        container.innerHTML = `<div class="empty">Erro ao carregar jogos: ${err.message}</div>`;
+        return;
+      }
+      renderMatchGroups(groups, containerId, badgeId);
+    }
+
+    function loadToday() {
+      loadMatchesForDate(todayISO(), todayCompact(), document.getElementById('hojeLeague').value, 'hojeContent', 'hojeBadge');
+    }
+    function loadTomorrow() {
+      loadMatchesForDate(tomorrowISO(), tomorrowCompact(), document.getElementById('amanhaLeague').value, 'amanhaContent', 'amanhaBadge');
+    }
+
+    async function loadStandings() {
+      const id = document.getElementById('tabelaLeague').value;
+      const league = findLeague(id);
+      const container = document.getElementById('tabelaContent');
+      if (!league) { container.innerHTML = `<div class="empty">Selecione um campeonato.</div>`; return; }
+      container.innerHTML = `<div class="loading"><div class="spinner"></div>Carregando tabela...</div>`;
+
+      try {
+        if (league.source === 'fd') {
+          const data = await fetchFD(`/competitions/${league.code}/standings`);
+          const table = data.standings?.find(s => s.type === 'TOTAL')?.table || data.standings?.[0]?.table || [];
+          if (!table.length) { container.innerHTML = `<div class="empty">Tabela indisponível.</div>`; return; }
+          renderFDTable(table, container);
+        } else if (league.source === 'af') {
+          const data = await fetchAF(`/standings?league=${league.afId}&season=${league.season}`);
+          const rows = data.response?.[0]?.league?.standings?.[0] || data.response?.[0]?.league?.standings || [];
+          const flat = Array.isArray(rows[0]) ? rows.flat() : rows;
+          if (!flat.length) { container.innerHTML = `<div class="empty">Tabela ainda não disponível.</div>`; return; }
+          renderAFTable(flat, container);
+        } else if (league.source === 'ol') {
+          container.innerHTML = `<div class="empty">Tabela não disponível via OpenLigaDB. Use histórico ou outra fonte.</div>`;
+        } else {
+          let entries = [];
+          for (const season of [2026, 2025, '']) {
+            try {
+              const path = season ? `/${league.slug}/standings?season=${season}` : `/${league.slug}/standings`;
+              const data = await fetchWC(path);
+              entries = data.children?.[0]?.standings?.entries || data.standings?.entries || data.entries || [];
+              if (entries.length) break;
+            } catch (_) {}
+          }
+          if (!entries.length) { container.innerHTML = `<div class="empty">Tabela indisponível.</div>`; return; }
+          entries.sort((a, b) => {
+            const ra = +(a.stats?.find(s => s.name === 'rank')?.displayValue || 99);
+            const rb = +(b.stats?.find(s => s.name === 'rank')?.displayValue || 99);
+            return ra - rb;
+          });
+          renderWCTable(entries, container);
+        }
+        updateStatus();
+      } catch (err) {
+        container.innerHTML = `<div class="empty">Erro: ${err.message}</div>`;
+      }
+    }
+
+    function renderFDTable(table, container) {
+      const rows = table.map((row, idx) => {
+        const pos = row.position || (idx + 1);
+        const posClass = pos <= 4 ? 'top' : (pos >= table.length - 2 ? 'bottom' : '');
+        const crest = row.team?.crest ? `<img src="${row.team.crest}" alt="" onerror="this.style.display='none'">` : '';
+        return `<tr><td class="pos ${posClass}">${pos}</td><td><div class="team-cell">${crest}${row.team?.shortName || row.team?.name || '—'}</div></td>
+          <td>${row.playedGames ?? '—'}</td><td>${row.won ?? '—'}</td><td>${row.draw ?? '—'}</td><td>${row.lost ?? '—'}</td>
+          <td>${row.goalsFor ?? '—'}</td><td>${row.goalsAgainst ?? '—'}</td><td>${row.goalDifference ?? '—'}</td>
+          <td><strong>${row.points ?? '—'}</strong></td></tr>`;
+      }).join('');
+      container.innerHTML = `<div class="table-wrap"><table><thead><tr><th>#</th><th>Time</th><th>J</th><th>V</th><th>E</th><th>D</th><th>GP</th><th>GC</th><th>SG</th><th>Pts</th></tr></thead><tbody>${rows}</tbody></table></div>
+        <p style="margin-top:12px;font-size:0.8rem;color:var(--text-muted)">Fonte: football-data.org · Escudos oficiais</p>`;
+    }
+    function renderAFTable(table, container) {
+      const rows = table.map((row, idx) => {
+        const pos = row.rank || (idx + 1);
+        const posClass = pos <= 4 ? 'top' : (pos >= table.length - 2 ? 'bottom' : '');
+        const logo = row.team?.logo ? `<img src="${row.team.logo}" alt="" onerror="this.style.display='none'">` : '';
+        return `<tr><td class="pos ${posClass}">${pos}</td><td><div class="team-cell">${logo}${row.team?.name || '—'}</div></td>
+          <td>${row.all?.played ?? '—'}</td><td>${row.all?.win ?? '—'}</td><td>${row.all?.draw ?? '—'}</td><td>${row.all?.lose ?? '—'}</td>
+          <td>${row.all?.goals?.for ?? '—'}</td><td>${row.all?.goals?.against ?? '—'}</td><td>${row.goalsDiff ?? '—'}</td>
+          <td><strong>${row.points ?? '—'}</strong></td></tr>`;
+      }).join('');
+      container.innerHTML = `<div class="table-wrap"><table><thead><tr><th>#</th><th>Time</th><th>J</th><th>V</th><th>E</th><th>D</th><th>GP</th><th>GC</th><th>SG</th><th>Pts</th></tr></thead><tbody>${rows}</tbody></table></div>
+        <p style="margin-top:12px;font-size:0.8rem;color:var(--text-muted)">Fonte: API-Football · Ligas asiáticas</p>`;
+    }
+    function renderWCTable(entries, container) {
+      const rows = entries.map((e, idx) => {
+        const stats = {};
+        (e.stats || []).forEach(s => { stats[s.name] = s.displayValue; });
+        const pos = stats.rank || (idx + 1);
+        const posClass = pos <= 4 ? 'top' : (pos >= entries.length - 2 ? 'bottom' : '');
+        const logo = e.team?.logo ? `<img src="${e.team.logo}" alt="" onerror="this.style.display='none'">` : '';
+        return `<tr><td class="pos ${posClass}">${pos}</td><td><div class="team-cell">${logo}${e.team?.displayName || e.team?.name || '—'}</div></td>
+          <td>${stats.gamesPlayed || '—'}</td><td>${stats.wins || '—'}</td><td>${stats.ties || '—'}</td><td>${stats.losses || '—'}</td>
+          <td>${stats.pointsFor || '—'}</td><td>${stats.pointsAgainst || '—'}</td><td>${stats.pointDifferential || '—'}</td>
+          <td><strong>${stats.points || '—'}</strong></td></tr>`;
+      }).join('');
+      container.innerHTML = `<div class="table-wrap"><table><thead><tr><th>#</th><th>Time</th><th>J</th><th>V</th><th>E</th><th>D</th><th>GP</th><th>GC</th><th>SG</th><th>Pts</th></tr></thead><tbody>${rows}</tbody></table></div>
+        <p style="margin-top:12px;font-size:0.8rem;color:var(--text-muted)">Fonte: Free API</p>`;
+    }
+
+    async function loadHistory() {
+      const id = document.getElementById('histLeague').value;
+      const league = findLeague(id);
+      const container = document.getElementById('histContent');
+      if (!league) { container.innerHTML = `<div class="empty">Selecione um campeonato.</div>`; return; }
+      container.innerHTML = `<div class="loading"><div class="spinner"></div>Carregando resultados...</div>`;
+
+      try {
+        let events = [];
+        if (league.source === 'fd') {
+          const data = await fetchFD(`/competitions/${league.code}/matches?status=FINISHED&limit=40`);
+          events = (data.matches || []).sort((a, b) => new Date(b.utcDate) - new Date(a.utcDate)).slice(0, 30).map(normalizeFDMatch);
+        } else if (league.source === 'af') {
+          const data = await fetchAF(`/fixtures?league=${league.afId}&season=${league.season}&status=FT&last=30`);
+          events = (data.response || []).map(normalizeAFMatch);
+        } else if (league.source === 'ol') {
+          const data = await fetchOL(`/getmatchdata/${league.shortcut}/${league.season}`);
+          events = (Array.isArray(data) ? data : []).filter(m => m.matchIsFinished)
+            .sort((a, b) => new Date(b.matchDateTimeUTC || b.matchDateTime) - new Date(a.matchDateTimeUTC || a.matchDateTime))
+            .slice(0, 30).map(normalizeOLMatch);
+        } else {
+          const dates = [];
+          for (let i = 1; i <= 10; i++) { const d = new Date(); d.setDate(d.getDate() - i); dates.push(d.toISOString().slice(0, 10).replace(/-/g, '')); }
+          const results = await Promise.allSettled(dates.map(dt => fetchWC(`/${league.slug}/scoreboard?dates=${dt}`)));
+          results.forEach(r => {
+            if (r.status !== 'fulfilled') return;
+            const d = r.value;
+            let evs = d.events || d.leagues?.[0]?.events || [];
+            if (!evs.length && d.leagues) evs = d.leagues.flatMap(lg => lg.events || []);
+            events.push(...evs.map(normalizeWCEvent).filter(e => e.isFT));
+          });
+          events = events.slice(0, 30);
+        }
+        if (!events.length) { container.innerHTML = `<div class="empty">Nenhum resultado recente.</div>`; return; }
+        renderMatchGroups([{ name: league.name, source: league.source, events }], 'histContent', null);
+      } catch (err) {
+        container.innerHTML = `<div class="empty">Erro: ${err.message}</div>`;
+      }
+    }
+
+    async function loadMeta() {
+      const parts = [];
+      try {
+        const meta = await fetchWC('/meta');
+        const cov = meta.coverage || {};
+        parts.push(`
+          <div class="stats-grid">
+            <div class="stat-card"><div class="stat-value">${cov.competitions || '—'}</div><div class="stat-label">Free API</div></div>
+            <div class="stat-card"><div class="stat-value">${getFdKey() ? FD_COMPS.length : 0}</div><div class="stat-label">football-data</div></div>
+            <div class="stat-card"><div class="stat-value">${OL_COMPS.length}</div><div class="stat-label">OpenLigaDB</div></div>
+            <div class="stat-card"><div class="stat-value">${getAfKey() ? AF_ASIA_COMPS.length : 0}</div><div class="stat-label">Ásia (API-Football)</div></div>
+            <div class="stat-card"><div class="stat-value">${leagues.length}</div><div class="stat-label">Total no app</div></div>
+            <div class="stat-card"><div class="stat-value">${getAfKey() ? 'Sim' : 'Não'}</div><div class="stat-label">Chave Ásia</div></div>
+          </div>
+          <div class="card">
+            <p><strong>Ligas asiáticas:</strong> ${getAfKey()
+              ? 'Ativas — J1, J2, K League 1/2, CSL, Saudi Pro, A-League, AFC CL Elite/Two, Thai League, ISL'
+              : 'Desativadas. Adicione chave API-Football em Config.'}</p>
+          </div>`);
+      } catch (e) {
+        parts.push(`<div class="empty">Metadados indisponíveis.</div>`);
+      }
+      document.getElementById('statsContent').innerHTML = parts.join('');
+    }
+
+    function startAutoRefresh() {
+      if (autoRefreshTimer) clearInterval(autoRefreshTimer);
+      autoRefreshTimer = setInterval(() => {
+        if (document.getElementById('hoje').classList.contains('active')) loadToday();
+      }, 45000);
+    }
+
+    document.getElementById('fdKey').value = getFdKey();
+    document.getElementById('afKey').value = getAfKey();
+    setKeyStatus(localStorage.getItem('fd_api_key') ? 'Chave FD do navegador.' : 'Chave FD padrão ativa.', true);
+    setAfKeyStatus(localStorage.getItem('af_api_key') ? 'Chave API-Football do navegador ativa.' : 'Chave API-Football padrão do código ativa.', true);
+    initLeagues();
+    startAutoRefresh();
+  </script>
+</body>
+</html>
