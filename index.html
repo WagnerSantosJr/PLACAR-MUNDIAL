@@ -545,7 +545,7 @@ function getH2H(m){
     d=new Date(d.getTime()-(240+r()*400)*864e5);
     const swap=r()<.5;const H=swap?m.a:m.h,A=swap?m.h:m.a;
     const s1=poisson(r,1.35*Math.pow(H.st/A.st,.9)+.18),s2=poisson(r,1.1*Math.pow(A.st/H.st,.9)+.12);
-    if(s1>s2)(swap?wa:wh)++;else if(s1<s2)(swap?wh:wa)++;else wd++;
+    if(s1>s2){if(swap)wa++;else wh++;}else if(s1<s2){if(swap)wh++;else wa++;}else wd++;
     gh+=swap?s2:s1;ga+=swap?s1:s2;
     games.push({d,H,A,s1,s2,comp:r()<.5?m.lg.name:['Copa Nacional','Torneio Continental','Amistoso'][Math.floor(r()*3)]});
   }
