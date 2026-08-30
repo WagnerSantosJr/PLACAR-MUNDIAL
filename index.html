@@ -3,377 +3,238 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-<title>RADAR MUNDIAL</title>
-<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ccircle cx='50' cy='50' r='46' fill='%230B0F14' stroke='%2339FF88' stroke-width='4'/%3E%3Ccircle cx='50' cy='50' r='4' fill='%2339FF88'/%3E%3C/svg%3E">
+<meta name="theme-color" content="#0A0E13">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="RADAR FUTEBOL">
+<title>RADAR FUTEBOL</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' rx='20' fill='%230A0E13'/%3E%3Ccircle cx='50' cy='50' r='16' fill='%2339FF9C'/%3E%3C/svg%3E">
+<link rel="apple-touch-icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' rx='20' fill='%230A0E13'/%3E%3Ccircle cx='50' cy='50' r='16' fill='%2339FF9C'/%3E%3C/svg%3E">
+<link rel="manifest" id="pwa-manifest">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@500;600;700&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
 <style>
-  /* ============ TOKENS ============ */
   :root{
-    --bg:#0A0E13;
-    --bg-elev:#121822;
-    --bg-elev-2:#1A222E;
-    --border:#243040;
-    --text:#E9EFF5;
-    --text-dim:#8FA1B3;
-    --accent:#39FF9C;
-    --accent-dim:#1E8C58;
-    --accent2:#3B9CFF;
-    --warn:#FFB020;
-    --danger:#FF5C5C;
-    --radius:14px;
-    --radius-sm:8px;
-    --font-display:'Rajdhani',sans-serif;
-    --font-body:'Inter',sans-serif;
-    --font-mono:'JetBrains Mono',monospace;
+    --bg:#0A0E13; --bg-elev:#121822; --bg-elev-2:#1A222E; --border:#243040;
+    --text:#E9EFF5; --text-dim:#8FA1B3;
+    --accent:#39FF9C; --accent-dim:#1E8C58; --accent2:#3B9CFF;
+    --warn:#FFB020; --danger:#FF5C5C;
+    --radius:14px; --radius-sm:8px;
+    --font-display:'Rajdhani',sans-serif; --font-body:'Inter',sans-serif; --font-mono:'JetBrains Mono',monospace;
     --shadow:0 8px 24px rgba(0,0,0,.35);
   }
   [data-theme="light"]{
-    --bg:#F2F5F8;
-    --bg-elev:#FFFFFF;
-    --bg-elev-2:#EAEFF3;
-    --border:#D8E0E8;
-    --text:#101820;
-    --text-dim:#5B6B7A;
-    --accent:#0FA85C;
-    --accent-dim:#0C7C44;
-    --accent2:#1D6FE0;
+    --bg:#F2F5F8; --bg-elev:#FFFFFF; --bg-elev-2:#EAEFF3; --border:#D8E0E8;
+    --text:#101820; --text-dim:#5B6B7A;
+    --accent:#0FA85C; --accent-dim:#0C7C44; --accent2:#1D6FE0;
     --shadow:0 8px 24px rgba(20,30,40,.08);
   }
   *{box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
   html,body{margin:0;padding:0;}
-  body{
-    background:var(--bg);
-    color:var(--text);
-    font-family:var(--font-body);
-    min-height:100vh;
-    transition:background .25s ease,color .25s ease;
-  }
+  body{background:var(--bg);color:var(--text);font-family:var(--font-body);min-height:100vh;transition:background .25s ease,color .25s ease;}
   ::selection{background:var(--accent);color:#04140C;}
   :focus-visible{outline:2px solid var(--accent);outline-offset:2px;border-radius:4px;}
   button{font-family:inherit;cursor:pointer;}
+  input,select{font-family:inherit;}
   .mono{font-family:var(--font-mono);}
 
-  /* ============ LAYOUT ============ */
   .app{max-width:900px;margin:0 auto;padding:0 16px 96px;}
   .topbar{
-    position:sticky;top:0;z-index:20;
-    display:flex;align-items:center;gap:14px;
-    padding:16px 4px 12px;
-    background:linear-gradient(var(--bg) 78%, transparent);
+    position:sticky;top:0;z-index:20;display:flex;align-items:center;gap:14px;
+    padding:16px 4px 12px;background:var(--bg);border-bottom:1px solid transparent;
   }
-  .radar-logo{width:44px;height:44px;flex:none;position:relative;}
-  .radar-logo svg{width:100%;height:100%;display:block;}
-  .radar-sweep{
-    transform-origin:50px 50px;
-    animation:sweep 3.2s linear infinite;
+  .live-pulse{width:34px;height:34px;flex:none;display:flex;align-items:center;justify-content:center;
+    border-radius:50%;background:var(--bg-elev);border:1px solid var(--border);}
+  .live-pulse-dot{width:12px;height:12px;border-radius:50%;background:var(--accent);
+    box-shadow:0 0 0 0 rgba(46,204,113,.6);animation:pulse-green 1.6s infinite;}
+  @keyframes pulse-green{
+    0%{box-shadow:0 0 0 0 rgba(46,204,113,.55);}
+    70%{box-shadow:0 0 0 9px rgba(46,204,113,0);}
+    100%{box-shadow:0 0 0 0 rgba(46,204,113,0);}
   }
-  @keyframes sweep{ to{ transform:rotate(360deg); } }
-  .radar-blip{ animation:blip 2.4s ease-in-out infinite; }
-  .radar-blip.b2{ animation-delay:.6s; }
-  .radar-blip.b3{ animation-delay:1.3s; }
-  @keyframes blip{ 0%,100%{opacity:.25;} 50%{opacity:1;} }
   @media (prefers-reduced-motion:reduce){
-    .radar-sweep{animation:none;}
-    .radar-blip{animation:none;opacity:.8;}
+    .live-pulse-dot, .mini-dot, .live-dot{animation:none;opacity:.85;}
+    .goal-flash{animation:none;}
   }
-  .brand h1{
-    font-family:var(--font-display);
-    font-weight:700;font-size:22px;letter-spacing:1.5px;
-    margin:0;line-height:1;
-  }
-  .brand p{
-    margin:3px 0 0;font-size:11.5px;color:var(--text-dim);
-    letter-spacing:.4px;
-  }
+  .brand h1{font-family:var(--font-display);font-weight:700;font-size:22px;letter-spacing:1.5px;margin:0;line-height:1;}
+  .brand p{margin:3px 0 0;font-size:11.5px;color:var(--text-dim);letter-spacing:.4px;}
   .topbar-actions{margin-left:auto;display:flex;gap:8px;}
-  .icon-btn{
-    width:38px;height:38px;border-radius:50%;
-    border:1px solid var(--border);background:var(--bg-elev);
-    color:var(--text);display:flex;align-items:center;justify-content:center;
-    transition:border-color .15s, transform .1s;
-  }
+  .icon-btn{width:38px;height:38px;border-radius:50%;border:1px solid var(--border);background:var(--bg-elev);
+    color:var(--text);display:flex;align-items:center;justify-content:center;transition:border-color .15s, transform .1s;}
   .icon-btn:hover{border-color:var(--accent);}
   .icon-btn:active{transform:scale(.92);}
 
-  /* ============ TABS ============ */
-  .tabs{
-    display:flex;gap:6px;overflow-x:auto;
-    padding:4px 4px 14px;scrollbar-width:none;
-  }
+  .tabs{display:flex;gap:6px;overflow-x:auto;padding:4px 4px 14px;scrollbar-width:none;}
   .tabs::-webkit-scrollbar{display:none;}
-  .tab-btn{
-    flex:none;
-    background:var(--bg-elev);
-    border:1px solid var(--border);
-    color:var(--text-dim);
-    padding:9px 15px;border-radius:999px;
-    font-size:13px;font-weight:600;
-    display:flex;align-items:center;gap:7px;
-    transition:all .15s ease;
-    white-space:nowrap;
-  }
+  .tab-btn{flex:none;background:var(--bg-elev);border:1px solid var(--border);color:var(--text-dim);
+    padding:9px 15px;border-radius:999px;font-size:13px;font-weight:600;display:flex;align-items:center;gap:7px;
+    transition:all .15s ease;white-space:nowrap;}
   .tab-btn svg{width:15px;height:15px;flex:none;}
-  .tab-btn[aria-selected="true"]{
-    background:var(--accent);color:#04140C;border-color:var(--accent);
-  }
-  .tab-btn .live-dot{
-    width:7px;height:7px;border-radius:50%;background:var(--danger);
-    box-shadow:0 0 0 0 rgba(255,92,92,.6);
-    animation:pulse-dot 1.6s infinite;
-  }
+  .tab-btn[aria-selected="true"]{background:var(--accent);color:#04140C;border-color:var(--accent);}
+  .tab-btn .live-dot{width:7px;height:7px;border-radius:50%;background:var(--danger);
+    box-shadow:0 0 0 0 rgba(255,92,92,.6);animation:pulse-dot 1.6s infinite;}
   .tab-btn[aria-selected="true"] .live-dot{background:#04140C;box-shadow:none;animation:none;}
+  .live-count{background:var(--danger);color:#fff;font-size:9.5px;font-weight:800;padding:1px 6px;
+    border-radius:999px;line-height:1.5;margin-left:1px;}
+  .tab-btn[aria-selected="true"] .live-count{background:#04140C;color:var(--accent);}
   @keyframes pulse-dot{
-    0%{box-shadow:0 0 0 0 rgba(255,92,92,.55);}
-    70%{box-shadow:0 0 0 7px rgba(255,92,92,0);}
-    100%{box-shadow:0 0 0 0 rgba(255,92,92,0);}
+    0%{box-shadow:0 0 0 0 rgba(255,92,92,.55);} 70%{box-shadow:0 0 0 7px rgba(255,92,92,0);} 100%{box-shadow:0 0 0 0 rgba(255,92,92,0);}
   }
-
   .tab-panel{display:none;animation:fadeIn .2s ease;}
   .tab-panel.active{display:block;}
   @keyframes fadeIn{from{opacity:0;transform:translateY(4px);}to{opacity:1;transform:translateY(0);}}
 
-  /* ============ COMMON UI ============ */
-  .panel-head{
-    display:flex;align-items:center;justify-content:space-between;
-    margin:4px 0 14px;gap:10px;flex-wrap:wrap;
-  }
+  .panel-head{display:flex;align-items:center;justify-content:space-between;margin:4px 0 14px;gap:10px;flex-wrap:wrap;}
   .panel-title{font-family:var(--font-display);font-size:19px;font-weight:700;margin:0;letter-spacing:.3px;}
   .panel-sub{font-size:12px;color:var(--text-dim);margin-top:2px;}
   .refresh-row{display:flex;align-items:center;gap:10px;font-size:11.5px;color:var(--text-dim);}
-  .refresh-btn{
-    display:flex;align-items:center;gap:6px;
-    background:var(--bg-elev);border:1px solid var(--border);
-    color:var(--text);padding:7px 12px;border-radius:999px;font-size:12.5px;font-weight:500;
-  }
+  .refresh-btn{display:flex;align-items:center;gap:6px;background:var(--bg-elev);border:1px solid var(--border);
+    color:var(--text);padding:7px 12px;border-radius:999px;font-size:12.5px;font-weight:500;}
   .refresh-btn svg{width:13px;height:13px;}
   .refresh-btn.spinning svg{animation:spin .8s linear infinite;}
   @keyframes spin{to{transform:rotate(360deg);}}
 
-  .search-input{
-    width:100%;padding:11px 14px;border-radius:var(--radius-sm);
-    border:1px solid var(--border);background:var(--bg-elev);
-    color:var(--text);font-size:13.5px;margin-bottom:14px;
-  }
+  .search-input{width:100%;padding:11px 14px;border-radius:var(--radius-sm);border:1px solid var(--border);
+    background:var(--bg-elev);color:var(--text);font-size:13.5px;margin-bottom:14px;}
   .search-input::placeholder{color:var(--text-dim);}
 
-  .disclaimer{
-    font-size:11.5px;color:var(--text-dim);border:1px dashed var(--border);
-    border-radius:var(--radius-sm);padding:9px 12px;margin-bottom:16px;line-height:1.5;
-  }
-
-  .state-box{
-    text-align:center;padding:48px 16px;color:var(--text-dim);
-  }
+  .disclaimer{font-size:11.5px;color:var(--text-dim);border:1px dashed var(--border);border-radius:var(--radius-sm);
+    padding:9px 12px;margin-bottom:16px;line-height:1.5;}
+  .state-box{text-align:center;padding:48px 16px;color:var(--text-dim);}
   .state-box svg{width:34px;height:34px;margin-bottom:10px;opacity:.6;}
   .state-box p{margin:2px 0;font-size:13px;}
   .state-box .big{font-size:14px;color:var(--text);font-weight:600;}
-  .error-box{
-    background:rgba(255,92,92,.08);border:1px solid rgba(255,92,92,.35);
-    color:var(--danger);border-radius:var(--radius-sm);padding:12px 14px;
-    font-size:12.5px;margin-bottom:14px;
-  }
-
-  .skeleton{
-    background:linear-gradient(90deg,var(--bg-elev) 25%,var(--bg-elev-2) 37%,var(--bg-elev) 63%);
-    background-size:400% 100%;animation:shine 1.4s ease infinite;
-    border-radius:var(--radius);height:96px;margin-bottom:12px;
-  }
+  .error-box{background:rgba(255,92,92,.08);border:1px solid rgba(255,92,92,.35);color:var(--danger);
+    border-radius:var(--radius-sm);padding:12px 14px;font-size:12.5px;margin-bottom:14px;}
+  .warn-box{background:rgba(255,176,32,.08);border:1px solid rgba(255,176,32,.35);color:var(--warn);
+    border-radius:var(--radius-sm);padding:12px 14px;font-size:12px;margin-bottom:14px;line-height:1.5;}
+  .skeleton{background:linear-gradient(90deg,var(--bg-elev) 25%,var(--bg-elev-2) 37%,var(--bg-elev) 63%);
+    background-size:400% 100%;animation:shine 1.4s ease infinite;border-radius:var(--radius);height:96px;margin-bottom:12px;}
   @keyframes shine{0%{background-position:100% 0;}100%{background-position:0 0;}}
 
-  /* ============ LIVE MATCH CARD ============ */
-  .match-card{
-    background:var(--bg-elev);border:1px solid var(--border);
-    border-radius:var(--radius);padding:14px 16px;margin-bottom:12px;
-    box-shadow:var(--shadow);
-  }
-  .mc-top{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;}
-  .mc-league{font-size:11px;color:var(--text-dim);display:flex;align-items:center;gap:6px;}
-  .mc-league img{width:14px;height:14px;object-fit:contain;}
-  .mc-minute{
-    font-family:var(--font-mono);font-size:11.5px;font-weight:500;
-    color:var(--danger);display:flex;align-items:center;gap:5px;
-  }
+  .match-card{background:var(--bg-elev);border:1px solid var(--border);border-radius:var(--radius);
+    padding:14px 16px;margin-bottom:12px;box-shadow:var(--shadow);}
+  .mc-top{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;gap:8px;}
+  .mc-league{font-size:11px;color:var(--text-dim);display:flex;align-items:center;gap:6px;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+  .mc-league img{width:14px;height:14px;object-fit:contain;flex:none;}
+  .mc-minute{font-family:var(--font-mono);font-size:11.5px;font-weight:500;color:var(--danger);
+    display:flex;align-items:center;gap:5px;flex:none;}
   .mc-minute .dot{width:6px;height:6px;border-radius:50%;background:var(--danger);animation:pulse-dot 1.6s infinite;}
   .mc-teams{display:flex;align-items:center;gap:10px;}
   .mc-team{flex:1;display:flex;align-items:center;gap:9px;min-width:0;}
   .mc-team img{width:26px;height:26px;object-fit:contain;flex:none;}
   .mc-team span{font-size:14px;font-weight:600;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
   .mc-team.away{flex-direction:row-reverse;text-align:right;}
-  .mc-score{
-    font-family:var(--font-display);font-size:24px;font-weight:700;
-    padding:2px 12px;flex:none;letter-spacing:1px;
+  .mc-score{font-family:var(--font-display);font-size:24px;font-weight:700;padding:2px 12px;flex:none;letter-spacing:1px;}
+  .goal-flash{animation:goalFlash 1.4s ease;border-radius:8px;}
+  @keyframes goalFlash{
+    0%{color:var(--accent);background:rgba(57,255,156,.22);transform:scale(1.3);}
+    60%{color:var(--accent);background:rgba(57,255,156,.1);transform:scale(1.05);}
+    100%{color:inherit;background:transparent;transform:scale(1);}
   }
-  .mc-predict{
-    margin-top:13px;padding-top:12px;border-top:1px dashed var(--border);
-  }
-  .mc-predict-head{
-    display:flex;align-items:center;justify-content:space-between;
-    font-size:11px;color:var(--text-dim);margin-bottom:7px;
-  }
-  .ai-tag{
-    display:inline-flex;align-items:center;gap:4px;
-    background:rgba(57,255,156,.1);color:var(--accent);
-    padding:2px 8px;border-radius:999px;font-size:10px;font-weight:700;letter-spacing:.4px;
-  }
-  .prob-bar{
-    display:flex;height:9px;border-radius:999px;overflow:hidden;background:var(--bg-elev-2);
-  }
+  .mc-predict{margin-top:13px;padding-top:12px;border-top:1px dashed var(--border);}
+  .mc-predict-head{display:flex;align-items:center;justify-content:space-between;font-size:11px;color:var(--text-dim);margin-bottom:7px;}
+  .ai-tag{display:inline-flex;align-items:center;gap:4px;background:rgba(57,255,156,.1);color:var(--accent);
+    padding:2px 8px;border-radius:999px;font-size:10px;font-weight:700;letter-spacing:.4px;}
+  .live-label{display:flex;align-items:center;gap:5px;}
+  .mini-dot{width:6px;height:6px;border-radius:50%;background:var(--accent);flex:none;animation:pulse-green 1.6s infinite;}
+  .prob-bar{display:flex;height:9px;border-radius:999px;overflow:hidden;background:var(--bg-elev-2);}
   .prob-bar span{height:100%;transition:width .4s ease;}
   .prob-bar .home{background:var(--accent);}
   .prob-bar .draw{background:var(--text-dim);}
   .prob-bar .away{background:var(--accent2);}
-  .prob-labels{
-    display:flex;justify-content:space-between;font-size:10.5px;
-    color:var(--text-dim);margin-top:5px;font-family:var(--font-mono);
-  }
-  .xg-row{
-    display:flex;justify-content:space-between;margin-top:9px;
-    font-size:11.5px;color:var(--text-dim);font-family:var(--font-mono);
-  }
-  .xg-row b{color:var(--text);font-weight:600;}
-  .predict-loading{font-size:11.5px;color:var(--text-dim);display:flex;align-items:center;gap:7px;}
-  .predict-loading .spin-mini{
-    width:11px;height:11px;border-radius:50%;
-    border:2px solid var(--border);border-top-color:var(--accent);
-    animation:spin .7s linear infinite;
-  }
+  .prob-labels{display:flex;justify-content:space-between;font-size:10.5px;color:var(--text-dim);margin-top:5px;font-family:var(--font-mono);}
+  .prob-labels span{max-width:33%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+  .fallback-note{margin-top:9px;font-size:10.5px;color:var(--text-dim);border-top:1px dashed var(--border);padding-top:8px;line-height:1.5;}
+  .calc-predict-btn{width:100%;background:var(--bg-elev-2);border:1px solid var(--border);color:var(--accent);
+    padding:9px 12px;border-radius:var(--radius-sm);font-size:12.5px;font-weight:700;letter-spacing:.2px;
+    transition:border-color .15s, background .15s;margin-top:9px;}
+  .calc-predict-btn:hover{border-color:var(--accent);background:rgba(57,255,156,.08);}
+  .calc-predict-btn:disabled{opacity:.6;}
 
-  /* ============ FIXTURE LIST (today/tomorrow) ============ */
   .league-group{margin-bottom:18px;}
-  .league-title{
-    display:flex;align-items:center;gap:8px;font-size:12px;
-    color:var(--text-dim);font-weight:600;margin-bottom:8px;letter-spacing:.3px;
-  }
+  .league-title{display:flex;align-items:center;gap:8px;font-size:12px;color:var(--text-dim);font-weight:600;
+    margin-bottom:8px;letter-spacing:.3px;}
   .league-title img{width:16px;height:16px;object-fit:contain;}
-  .fixture-row{
-    display:flex;align-items:center;gap:12px;
-    background:var(--bg-elev);border:1px solid var(--border);
-    border-radius:var(--radius-sm);padding:11px 14px;margin-bottom:8px;
-    transition:border-color .15s, transform .1s;
-    width:100%;text-align:left;color:var(--text);
-  }
+  .fixture-row{display:flex;align-items:center;gap:12px;background:var(--bg-elev);border:1px solid var(--border);
+    border-radius:var(--radius-sm);padding:11px 14px;margin-bottom:8px;transition:border-color .15s, transform .1s;
+    width:100%;text-align:left;color:var(--text);}
   .fixture-row:hover{border-color:var(--accent);transform:translateY(-1px);}
-  .fx-time{
-    font-family:var(--font-mono);font-size:12px;color:var(--text-dim);
-    width:46px;flex:none;text-align:center;
-  }
-  .fx-status{
-    font-size:9.5px;font-weight:700;padding:2px 6px;border-radius:5px;
-    background:var(--bg-elev-2);color:var(--text-dim);text-transform:uppercase;
-  }
+  .fx-time{font-family:var(--font-mono);font-size:12px;color:var(--text-dim);width:46px;flex:none;text-align:center;}
+  .fx-status{font-size:9.5px;font-weight:700;padding:2px 6px;border-radius:5px;background:var(--bg-elev-2);
+    color:var(--text-dim);text-transform:uppercase;}
   .fx-status.live{background:rgba(255,92,92,.15);color:var(--danger);}
   .fx-status.ft{background:rgba(57,255,156,.12);color:var(--accent);}
   .fx-teams{flex:1;min-width:0;}
   .fx-team-line{display:flex;align-items:center;gap:7px;font-size:13.5px;margin:2px 0;}
   .fx-team-line img{width:16px;height:16px;object-fit:contain;}
   .fx-team-line span{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
-  .fx-score-col{
-    font-family:var(--font-mono);font-weight:600;font-size:14px;
-    text-align:right;flex:none;line-height:1.5;
-  }
+  .fx-score-col{font-family:var(--font-mono);font-weight:600;font-size:14px;text-align:right;flex:none;line-height:1.5;}
   .chev{color:var(--text-dim);flex:none;}
 
-  /* ============ SETTINGS ============ */
-  .settings-card{
-    background:var(--bg-elev);border:1px solid var(--border);
-    border-radius:var(--radius);margin-bottom:12px;overflow:hidden;
-  }
-  .settings-row{
-    display:flex;align-items:center;justify-content:space-between;
-    padding:15px 16px;gap:14px;
-  }
+  .settings-card{background:var(--bg-elev);border:1px solid var(--border);border-radius:var(--radius);margin-bottom:12px;overflow:hidden;}
+  .settings-row{display:flex;align-items:center;justify-content:space-between;padding:15px 16px;gap:14px;}
   .settings-row + .settings-row{border-top:1px solid var(--border);}
+  .settings-row.col{flex-direction:column;align-items:stretch;gap:9px;}
   .settings-label{font-size:14px;font-weight:600;}
   .settings-desc{font-size:11.5px;color:var(--text-dim);margin-top:2px;}
   .switch{position:relative;width:44px;height:25px;flex:none;}
   .switch input{opacity:0;width:0;height:0;}
-  .slider{
-    position:absolute;inset:0;background:var(--bg-elev-2);
-    border:1px solid var(--border);border-radius:999px;transition:.2s;cursor:pointer;
-  }
-  .slider::before{
-    content:"";position:absolute;width:19px;height:19px;left:2px;top:2px;
-    background:var(--text-dim);border-radius:50%;transition:.2s;
-  }
+  .slider{position:absolute;inset:0;background:var(--bg-elev-2);border:1px solid var(--border);border-radius:999px;transition:.2s;cursor:pointer;}
+  .slider::before{content:"";position:absolute;width:19px;height:19px;left:2px;top:2px;background:var(--text-dim);border-radius:50%;transition:.2s;}
   input:checked + .slider{background:var(--accent-dim);border-color:var(--accent);}
   input:checked + .slider::before{transform:translateX(19px);background:var(--accent);}
   .seg-group{display:flex;gap:6px;background:var(--bg-elev-2);padding:3px;border-radius:999px;}
-  .seg-btn{
-    border:none;background:transparent;color:var(--text-dim);
-    padding:6px 13px;border-radius:999px;font-size:12px;font-weight:600;
-  }
+  .seg-btn{border:none;background:transparent;color:var(--text-dim);padding:6px 13px;border-radius:999px;font-size:12px;font-weight:600;}
   .seg-btn.active{background:var(--accent);color:#04140C;}
-  select.mini-select{
-    background:var(--bg-elev-2);color:var(--text);border:1px solid var(--border);
-    border-radius:8px;padding:7px 10px;font-size:12.5px;font-family:inherit;
-  }
-  .settings-note{
-    font-size:11px;color:var(--text-dim);line-height:1.6;
-    padding:12px 4px;
-  }
-  .settings-note code{
-    background:var(--bg-elev-2);padding:1px 5px;border-radius:4px;font-family:var(--font-mono);
-  }
+  select.mini-select{background:var(--bg-elev-2);color:var(--text);border:1px solid var(--border);border-radius:8px;
+    padding:7px 10px;font-size:12.5px;font-family:inherit;}
+  .token-input{width:100%;padding:10px 12px;border-radius:var(--radius-sm);border:1px solid var(--border);
+    background:var(--bg-elev-2);color:var(--text);font-size:12.5px;font-family:var(--font-mono);}
+  .token-row-actions{display:flex;gap:8px;align-items:center;margin-top:8px;flex-wrap:wrap;}
+  .token-status{font-size:11px;font-weight:700;padding:3px 9px;border-radius:999px;}
+  .token-status.on{background:rgba(57,255,156,.12);color:var(--accent);}
+  .token-status.off{background:var(--bg-elev-2);color:var(--text-dim);}
+  .link-btn{background:none;border:none;color:var(--accent2);font-size:12px;font-weight:600;padding:0;}
+  .settings-note{font-size:11px;color:var(--text-dim);line-height:1.7;padding:12px 4px;}
+  .settings-note code{background:var(--bg-elev-2);padding:1px 5px;border-radius:4px;font-family:var(--font-mono);}
+  .settings-note a{color:var(--accent2);}
+  .source-badge{display:inline-flex;align-items:center;gap:5px;font-size:10.5px;font-weight:700;padding:3px 8px;
+    border-radius:999px;background:var(--bg-elev-2);color:var(--text-dim);margin-bottom:10px;}
+  .source-badge b{color:var(--text);}
 
-  /* ============ MODAL ============ */
-  .modal-overlay{
-    position:fixed;inset:0;background:rgba(4,7,10,.7);
-    display:flex;align-items:flex-end;justify-content:center;
-    z-index:100;opacity:0;pointer-events:none;transition:opacity .2s ease;
-  }
+  .modal-overlay{position:fixed;inset:0;background:rgba(4,7,10,.7);display:flex;align-items:flex-end;justify-content:center;
+    z-index:100;opacity:0;pointer-events:none;transition:opacity .2s ease;}
   .modal-overlay.open{opacity:1;pointer-events:auto;}
   @media (min-width:640px){ .modal-overlay{align-items:center;} }
-  .modal-box{
-    background:var(--bg-elev);border:1px solid var(--border);
-    border-radius:18px 18px 0 0;width:100%;max-width:520px;max-height:85vh;
-    overflow-y:auto;transform:translateY(30px);transition:transform .25s ease;
-    box-shadow:var(--shadow);
-  }
+  .modal-box{background:var(--bg-elev);border:1px solid var(--border);border-radius:18px 18px 0 0;width:100%;
+    max-width:520px;max-height:85vh;overflow-y:auto;transform:translateY(30px);transition:transform .25s ease;box-shadow:var(--shadow);}
   @media (min-width:640px){ .modal-box{border-radius:18px;} }
   .modal-overlay.open .modal-box{transform:translateY(0);}
-  .modal-head{
-    position:sticky;top:0;background:var(--bg-elev);
-    padding:16px 18px 12px;border-bottom:1px solid var(--border);
-    display:flex;align-items:center;justify-content:space-between;
-  }
+  .modal-head{position:sticky;top:0;background:var(--bg-elev);padding:16px 18px 12px;border-bottom:1px solid var(--border);
+    display:flex;align-items:center;justify-content:space-between;}
   .modal-head h3{margin:0;font-family:var(--font-display);font-size:17px;}
-  .modal-close{
-    width:32px;height:32px;border-radius:50%;border:1px solid var(--border);
-    background:var(--bg-elev-2);color:var(--text);display:flex;align-items:center;justify-content:center;flex:none;
-  }
+  .modal-close{width:32px;height:32px;border-radius:50%;border:1px solid var(--border);background:var(--bg-elev-2);
+    color:var(--text);display:flex;align-items:center;justify-content:center;flex:none;}
   .modal-body{padding:16px 18px 26px;}
-  .modal-score-line{
-    display:flex;align-items:center;justify-content:center;gap:18px;
-    padding:10px 0 18px;
-  }
+  .modal-score-line{display:flex;align-items:center;justify-content:center;gap:18px;padding:10px 0 18px;}
   .modal-team{display:flex;flex-direction:column;align-items:center;gap:7px;width:96px;}
   .modal-team img{width:34px;height:34px;object-fit:contain;}
   .modal-team span{font-size:12px;text-align:center;font-weight:600;line-height:1.3;}
   .modal-score{font-family:var(--font-display);font-size:28px;font-weight:700;}
-  .stat-row{display:flex;align-items:center;gap:10px;margin-bottom:12px;font-size:12.5px;}
-  .stat-row .val{width:44px;text-align:center;font-family:var(--font-mono);font-weight:600;flex:none;}
-  .stat-row .lbl{flex:1;text-align:center;color:var(--text-dim);font-size:11.5px;}
-  .stat-bar-wrap{flex:1;display:flex;align-items:center;gap:2px;}
-  .stat-bar-track{flex:1;height:6px;background:var(--bg-elev-2);border-radius:4px;overflow:hidden;display:flex;flex-direction:row-reverse;}
-  .stat-bar-track.right{flex-direction:row;}
-  .stat-bar-fill{height:100%;background:var(--accent);}
-  .stat-bar-fill.away{background:var(--accent2);}
+  .modal-info-row{display:flex;justify-content:space-between;font-size:12.5px;padding:9px 0;border-top:1px solid var(--border);}
+  .modal-info-row span:first-child{color:var(--text-dim);}
+  .goal-timeline{margin-top:8px;}
+  .goal-item{display:flex;align-items:center;gap:8px;font-size:12.5px;padding:6px 0;}
+  .goal-item .gmin{font-family:var(--font-mono);color:var(--accent);width:34px;flex:none;}
 
-  /* ============ TOASTS ============ */
-  #toast-container{
-    position:fixed;bottom:18px;left:0;right:0;
-    display:flex;flex-direction:column;align-items:center;gap:8px;
-    z-index:200;pointer-events:none;padding:0 16px;
-  }
-  .toast{
-    background:var(--bg-elev-2);border:1px solid var(--accent);
-    color:var(--text);padding:11px 16px;border-radius:999px;
-    font-size:12.5px;font-weight:600;box-shadow:var(--shadow);
-    display:flex;align-items:center;gap:8px;
-    animation:toast-in .25s ease;max-width:340px;
-  }
+  #toast-container{position:fixed;bottom:18px;left:0;right:0;display:flex;flex-direction:column;align-items:center;gap:8px;
+    z-index:200;pointer-events:none;padding:0 16px;}
+  .toast{background:var(--bg-elev-2);border:1px solid var(--accent);color:var(--text);padding:11px 16px;border-radius:999px;
+    font-size:12.5px;font-weight:600;box-shadow:var(--shadow);display:flex;align-items:center;gap:8px;
+    animation:toast-in .25s ease;max-width:340px;}
   .toast .dot{width:7px;height:7px;border-radius:50%;background:var(--accent);flex:none;}
   @keyframes toast-in{from{opacity:0;transform:translateY(10px);}to{opacity:1;transform:translateY(0);}}
 </style>
@@ -381,25 +242,10 @@
 <body>
 <div class="app">
 
-  <!-- TOPBAR -->
   <header class="topbar">
-    <div class="radar-logo" aria-hidden="true">
-      <svg viewBox="0 0 100 100">
-        <circle cx="50" cy="50" r="46" fill="none" stroke="var(--border)" stroke-width="2"/>
-        <circle cx="50" cy="50" r="31" fill="none" stroke="var(--border)" stroke-width="1"/>
-        <circle cx="50" cy="50" r="16" fill="none" stroke="var(--border)" stroke-width="1"/>
-        <circle class="radar-blip" cx="68" cy="35" r="3" fill="var(--accent)"/>
-        <circle class="radar-blip b2" cx="32" cy="60" r="2.5" fill="var(--accent)"/>
-        <circle class="radar-blip b3" cx="58" cy="70" r="2" fill="var(--accent)"/>
-        <g class="radar-sweep">
-          <path d="M50 50 L50 6 A44 44 0 0 1 88 50 Z" fill="var(--accent)" opacity="0.16"/>
-          <line x1="50" y1="50" x2="50" y2="6" stroke="var(--accent)" stroke-width="2"/>
-        </g>
-        <circle cx="50" cy="50" r="3" fill="var(--accent)"/>
-      </svg>
-    </div>
+    <div class="live-pulse" aria-hidden="true"><span class="live-pulse-dot"></span></div>
     <div class="brand">
-      <h1>RADAR MUNDIAL</h1>
+      <h1>RADAR FUTEBOL</h1>
       <p>Painel preditivo de futebol ao vivo</p>
     </div>
     <div class="topbar-actions">
@@ -409,10 +255,9 @@
     </div>
   </header>
 
-  <!-- TABS -->
   <nav class="tabs" role="tablist" aria-label="Seções do aplicativo">
     <button class="tab-btn" data-tab="live" role="tab" aria-selected="true">
-      <span class="live-dot"></span> Análise ao Vivo
+      <span class="live-dot"></span> Análise ao Vivo <span class="live-count" id="live-count-badge" style="display:none;"></span>
     </button>
     <button class="tab-btn" data-tab="today" role="tab" aria-selected="false">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="17" rx="2"/><path d="M8 2v4M16 2v4M3 9h18"/></svg>
@@ -429,12 +274,11 @@
   </nav>
 
   <main>
-    <!-- ================= ANÁLISE AO VIVO ================= -->
     <section class="tab-panel active" id="panel-live">
       <div class="panel-head">
         <div>
           <p class="panel-title">Análise ao Vivo</p>
-          <p class="panel-sub">Modelo preditivo com base na forma recente das equipes</p>
+          <p class="panel-sub">Chance de vitória atualizada em tempo real</p>
         </div>
         <div class="refresh-row">
           <span id="live-updated-at">—</span>
@@ -445,13 +289,12 @@
         </div>
       </div>
       <div class="disclaimer">
-        As probabilidades são estimativas estatísticas (modelo de Poisson) calculadas a partir das médias de gols e da forma recente de cada equipe — não são garantia de resultado.
+        A chance de vitória é recalculada automaticamente a cada atualização com base no placar e no tempo de jogo atual da partida (modelo estatístico de Poisson). Toque em "Refinar previsão" para incluir o desempenho recente de cada equipe na competição.
       </div>
       <div id="live-error-box"></div>
       <div id="live-list"></div>
     </section>
 
-    <!-- ================= JOGOS DE HOJE ================= -->
     <section class="tab-panel" id="panel-today">
       <div class="panel-head">
         <div>
@@ -468,7 +311,6 @@
       <div id="today-list"></div>
     </section>
 
-    <!-- ================= JOGOS DE AMANHÃ ================= -->
     <section class="tab-panel" id="panel-tomorrow">
       <div class="panel-head">
         <div>
@@ -485,12 +327,33 @@
       <div id="tomorrow-list"></div>
     </section>
 
-    <!-- ================= CONFIGURAÇÃO ================= -->
     <section class="tab-panel" id="panel-settings">
       <div class="panel-head">
         <div>
           <p class="panel-title">Configuração</p>
-          <p class="panel-sub">Personalize alertas, tema e atualização de dados</p>
+          <p class="panel-sub">Fontes de dados, alertas, tema e instalação</p>
+        </div>
+      </div>
+
+      <div class="settings-card">
+        <div class="settings-row col">
+          <div>
+            <div class="settings-label">Alemanha · OpenLigaDB</div>
+            <div class="settings-desc">API pública alemã, sem chave e sem cadastro. Já está ativa — cobre Bundesliga e 2. Bundesliga.</div>
+          </div>
+          <span class="token-status on" style="align-self:flex-start;">ATIVA</span>
+        </div>
+        <div class="settings-row col">
+          <div>
+            <div class="settings-label">Brasil, Inglaterra, França e outros · football-data.org</div>
+            <div class="settings-desc">API pública gratuita, mas exige um token pessoal gratuito (cadastro rápido, sem cartão). Cobre Brasileirão Série A, Premier League, Ligue 1, Bundesliga, La Liga, Serie A e Champions League. O token fica salvo apenas neste navegador e é enviado direto do seu aparelho para o football-data.org — nunca passa por mim.</div>
+          </div>
+          <input type="text" class="token-input" id="fd-token-input" placeholder="Cole aqui seu token gratuito do football-data.org">
+          <div class="token-row-actions">
+            <span class="token-status off" id="fd-token-status">SEM TOKEN</span>
+            <button type="button" class="link-btn" id="fd-token-test">Testar conexão</button>
+            <button type="button" class="link-btn" id="fd-token-help">Como conseguir um token grátis?</button>
+          </div>
         </div>
       </div>
 
@@ -500,30 +363,21 @@
             <div class="settings-label">Alerta de gols</div>
             <div class="settings-desc">Notificação e som quando sair um gol em partida ao vivo</div>
           </div>
-          <label class="switch">
-            <input type="checkbox" id="setting-goal-alert">
-            <span class="slider"></span>
-          </label>
+          <label class="switch"><input type="checkbox" id="setting-goal-alert"><span class="slider"></span></label>
         </div>
         <div class="settings-row">
           <div>
             <div class="settings-label">Som do alerta</div>
             <div class="settings-desc">Tocar um bipe curto junto com a notificação de gol</div>
           </div>
-          <label class="switch">
-            <input type="checkbox" id="setting-sound">
-            <span class="slider"></span>
-          </label>
+          <label class="switch"><input type="checkbox" id="setting-sound"><span class="slider"></span></label>
         </div>
         <div class="settings-row">
           <div>
             <div class="settings-label">Notificações do navegador</div>
             <div class="settings-desc">Mostrar alerta mesmo com o app em segundo plano</div>
           </div>
-          <label class="switch">
-            <input type="checkbox" id="setting-browser-notif">
-            <span class="slider"></span>
-          </label>
+          <label class="switch"><input type="checkbox" id="setting-browser-notif"><span class="slider"></span></label>
         </div>
       </div>
 
@@ -541,25 +395,26 @@
         <div class="settings-row">
           <div>
             <div class="settings-label">Atualização ao vivo</div>
-            <div class="settings-desc">Frequência de atualização da Análise ao Vivo</div>
+            <div class="settings-desc">Frequência de atualização da Análise ao Vivo. Em 30s, evite deixar muitas partidas com "Refinar previsão" ativado ao mesmo tempo, para não esbarrar no limite de 10 req/min do football-data.org.</div>
           </div>
           <select class="mini-select" id="setting-refresh">
-            <option value="15">15 segundos</option>
             <option value="30">30 segundos</option>
             <option value="60">60 segundos</option>
+            <option value="90">90 segundos</option>
             <option value="120">2 minutos</option>
           </select>
         </div>
       </div>
 
       <div class="settings-note">
-        Dados fornecidos pela <b>API-FOOTBALL</b> (dashboard.api-football.com). A disponibilidade de campeonatos, temporadas e estatísticas depende do plano vinculado à chave configurada no aplicativo. Chave ativa: <code id="key-preview">—</code>
+        <b>Instalar como aplicativo:</b> abra este arquivo publicado em um site (ex.: GitHub Pages, Netlify ou Vercel — todos gratuitos) e, no Chrome do Android, toque em ⋮ → "Adicionar à tela inicial" para instalar como app, com ícone próprio e sem barra de endereço. Abrindo o arquivo direto do armazenamento do celular, o Chrome não libera essa instalação — é uma exigência de segurança do próprio navegador, não deste app.<br><br>
+        <b>Quer um .apk de verdade?</b> Depois de publicar o site acima, use a ferramenta gratuita <a href="https://www.pwabuilder.com" target="_blank" rel="noopener">pwabuilder.com</a> (da Microsoft): cole o link do seu site publicado e ela gera um pacote Android instalável a partir do app. Isso não é algo que eu consiga gerar diretamente aqui, pois exige um endereço público na internet e ferramentas de build do Android que este ambiente não possui.<br><br>
+        Requisições feitas nesta sessão: <code id="api-call-count">0</code>. O football-data.org permite até <b>10 requisições por minuto</b> e o OpenLigaDB não tem chave nem limite prático de uso pessoal.
       </div>
     </section>
   </main>
 </div>
 
-<!-- MODAL DE ESTATÍSTICAS -->
 <div class="modal-overlay" id="modal-overlay">
   <div class="modal-box" role="dialog" aria-modal="true" aria-labelledby="modal-title">
     <div class="modal-head">
@@ -579,521 +434,631 @@
 "use strict";
 
 /* ==========================================================
-   CONFIGURAÇÃO DA API
+   FONTES DE DADOS — APIs PÚBLICAS E GRATUITAS
+   ==========================================================
+   1) OpenLigaDB (api.openligadb.de) — Alemanha. 100% gratuita,
+      sem chave, sem cadastro. Mantida pela comunidade.
+   2) football-data.org (api.football-data.org) — multi-países.
+      Gratuita, mas exige um token pessoal (cadastro grátis em
+      football-data.org/client/register). Sem esse token, apenas
+      os dados alemães (OpenLigaDB) aparecem no app.
    ========================================================== */
-const API_KEY  = "646eb40afcfa4369ea0c809fae11a579";
-const API_BASE = "https://v3.football.api-sports.io";
-// Média histórica aproximada de gols por equipe por partida, usada como
-// referência neutra no modelo preditivo (ajuste fino, não é um valor oficial).
-const LEAGUE_AVG_GOALS = 1.35;
+const OLD_BASE = "https://api.openligadb.de";
+const FD_BASE  = "https://api.football-data.org/v4";
+
+const OPENLIGA_LEAGUES = [
+  { shortcut:"bl1", label:"Bundesliga",     country:"Alemanha" },
+  { shortcut:"bl2", label:"2. Bundesliga",  country:"Alemanha" }
+];
+
+const FD_COMPETITIONS = [
+  { code:"BSA", label:"Brasileirão Série A", country:"Brasil"      },
+  { code:"PL",  label:"Premier League",      country:"Inglaterra"  },
+  { code:"FL1", label:"Ligue 1",             country:"França"      },
+  { code:"BL1", label:"Bundesliga",          country:"Alemanha"    },
+  { code:"PD",  label:"La Liga",             country:"Espanha"     },
+  { code:"SA",  label:"Serie A",             country:"Itália"      },
+  { code:"CL",  label:"Champions League",    country:"Europa"      }
+];
 
 /* ==========================================================
    ESTADO / CONFIGURAÇÕES (persistidas em localStorage)
    ========================================================== */
 const DEFAULT_SETTINGS = {
-  theme: "dark",
-  goalAlert: true,
-  sound: true,
-  browserNotif: false,
-  refreshInterval: 30
+  theme: "dark", goalAlert: true, sound: true, browserNotif: false,
+  refreshInterval: 30, fdToken: "28a0d62e9b3c44e5a0d9d75e628abda3"
 };
 let settings = loadSettings();
 let liveTimer = null;
-let previousGoals = {}; // fixtureId -> {home, away}
-let statsCache = {};    // "teamId-leagueId-season" -> stats response
+let previousGoals = {};
 let loadedOnce = { today:false, tomorrow:false };
+let apiCallCount = 0;
+let hotFdCompetitions = new Set();     // competições com jogo ao vivo na última varredura
+let predictionBaseCache = {};          // matchId -> { xgHome, xgAway, refined }
+const DEFAULT_XG_HOME = 1.45, DEFAULT_XG_AWAY = 1.15;
 
 function loadSettings(){
   try{
-    const raw = localStorage.getItem("radarmundial_settings");
+    const raw = localStorage.getItem("radarfutebol_settings");
     return raw ? Object.assign({}, DEFAULT_SETTINGS, JSON.parse(raw)) : Object.assign({}, DEFAULT_SETTINGS);
   }catch(e){ return Object.assign({}, DEFAULT_SETTINGS); }
 }
-function saveSettings(){
-  localStorage.setItem("radarmundial_settings", JSON.stringify(settings));
-}
+function saveSettings(){ localStorage.setItem("radarfutebol_settings", JSON.stringify(settings)); }
 
 /* ==========================================================
    UTILITÁRIOS
    ========================================================== */
 function $(sel, ctx){ return (ctx||document).querySelector(sel); }
 function $all(sel, ctx){ return Array.from((ctx||document).querySelectorAll(sel)); }
-function el(tag, cls, html){
-  const e = document.createElement(tag);
-  if(cls) e.className = cls;
-  if(html !== undefined) e.innerHTML = html;
-  return e;
-}
-function escapeHtml(str){
-  return String(str||"").replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
-}
+function el(tag, cls, html){ const e=document.createElement(tag); if(cls) e.className=cls; if(html!==undefined) e.innerHTML=html; return e; }
+function escapeHtml(str){ return String(str||"").replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c])); }
 function dateStr(offsetDays){
-  const d = new Date();
-  d.setDate(d.getDate() + offsetDays);
-  return d.toISOString().slice(0,10);
+  const d = new Date(); d.setDate(d.getDate()+offsetDays);
+  const y = d.getFullYear(), mo = String(d.getMonth()+1).padStart(2,"0"), da = String(d.getDate()).padStart(2,"0");
+  return y + "-" + mo + "-" + da;
 }
-function formatDateLabel(offsetDays){
-  const d = new Date();
-  d.setDate(d.getDate() + offsetDays);
-  return d.toLocaleDateString("pt-BR", { weekday:"long", day:"2-digit", month:"long" });
+function formatDateLabel(offsetDays){ const d=new Date(); d.setDate(d.getDate()+offsetDays); return d.toLocaleDateString("pt-BR",{weekday:"long",day:"2-digit",month:"long"}); }
+function formatTime(iso){ try{ return new Date(iso).toLocaleTimeString("pt-BR",{hour:"2-digit",minute:"2-digit"}); }catch(e){ return "--:--"; } }
+function formatClock(){ return new Date().toLocaleTimeString("pt-BR",{hour:"2-digit",minute:"2-digit",second:"2-digit"}); }
+function shortName(name){ name = name||""; return name.length > 14 ? name.split(" ")[0] : name; }
+function sleep(ms){ return new Promise(r => setTimeout(r, ms)); }
+function isSameLocalDate(isoDate, offsetDays){
+  const target = new Date(); target.setDate(target.getDate()+offsetDays);
+  const d = new Date(isoDate);
+  return d.getFullYear()===target.getFullYear() && d.getMonth()===target.getMonth() && d.getDate()===target.getDate();
 }
-function formatTime(iso){
+function updateApiCounter(){ const c = document.getElementById("api-call-count"); if(c) c.textContent = String(apiCallCount); }
+
+/* ==========================================================
+   CHAMADAS ÀS APIs
+   ========================================================== */
+async function fetchOLD(path){
+  let res;
   try{
-    return new Date(iso).toLocaleTimeString("pt-BR", { hour:"2-digit", minute:"2-digit" });
-  }catch(e){ return "--:--"; }
+    res = await fetch(OLD_BASE + path, { method:"GET" });
+  }catch(e){
+    throw new Error("Não foi possível conectar ao OpenLigaDB. Verifique sua internet.");
+  }
+  apiCallCount++; updateApiCounter();
+  if(!res.ok) throw new Error("OpenLigaDB respondeu com erro (status " + res.status + ").");
+  try{ return await res.json(); }
+  catch(e){ throw new Error("Resposta inválida do OpenLigaDB."); }
 }
-function formatClock(){
-  return new Date().toLocaleTimeString("pt-BR", { hour:"2-digit", minute:"2-digit", second:"2-digit" });
+
+async function fetchFD(path, params){
+  if(!settings.fdToken){
+    throw new Error("Nenhum token do football-data.org configurado.");
+  }
+  const url = new URL(FD_BASE + path);
+  if(params) Object.keys(params).forEach(k => { if(params[k]!==undefined && params[k]!==null) url.searchParams.set(k, params[k]); });
+
+  let res;
+  try{
+    res = await fetch(url.toString(), { method:"GET", headers:{ "X-Auth-Token": settings.fdToken } });
+  }catch(e){
+    throw new Error("Não foi possível conectar ao football-data.org. Verifique sua internet.");
+  }
+  apiCallCount++; updateApiCounter();
+
+  if(res.status === 429) throw new Error("Limite de 10 requisições por minuto do football-data.org atingido. Aguarde um instante.");
+  if(res.status === 401 || res.status === 403) throw new Error("Token do football-data.org inválido, expirado ou sem acesso a este campeonato.");
+  if(!res.ok) throw new Error("football-data.org respondeu com erro (status " + res.status + ").");
+
+  try{ return await res.json(); }
+  catch(e){ throw new Error("Resposta inválida do football-data.org."); }
 }
 
 /* ==========================================================
-   CHAMADA À API-FOOTBALL
+   NORMALIZAÇÃO DOS DADOS (unifica as duas fontes num só formato)
    ========================================================== */
-async function apiFetch(path, params){
-  const url = new URL(API_BASE + path);
-  if(params){
-    Object.keys(params).forEach(k => { if(params[k] !== undefined && params[k] !== null) url.searchParams.set(k, params[k]); });
-  }
-  const res = await fetch(url.toString(), {
-    method: "GET",
-    headers: { "x-apisports-key": API_KEY }
-  });
-  if(!res.ok){
-    throw new Error("Falha de rede ao consultar a API (status " + res.status + ")");
-  }
-  const data = await res.json();
-  if(data.errors && Array.isArray(data.errors) === false && Object.keys(data.errors).length){
-    const msg = Object.values(data.errors).join(" | ");
-    throw new Error(msg || "A API retornou um erro.");
-  }
-  return data;
+function estimateElapsed(kickoffISO, status){
+  if(status === "FT") return 90;
+  if(status === "HT") return 45;
+  const mins = Math.floor((Date.now() - new Date(kickoffISO).getTime()) / 60000);
+  return Math.max(0, Math.min(mins, 90));
 }
 
-/* ==========================================================
-   MODELO PREDITIVO (Poisson + forma recente)
-   ========================================================== */
-function factorial(n){ let r=1; for(let i=2;i<=n;i++) r*=i; return r; }
-function poissonP(k, lambda){
-  return (Math.pow(lambda,k) * Math.exp(-lambda)) / factorial(k);
-}
-function formWinRatio(formStr){
-  if(!formStr) return 0.5;
-  const chars = formStr.slice(-5).split("");
-  if(!chars.length) return 0.5;
-  let score = 0;
-  chars.forEach(c => { if(c==="W") score += 1; else if(c==="D") score += 0.5; });
-  return score / chars.length; // 0..1
-}
-function safeAvg(v, fallback){
-  const n = parseFloat(v);
-  return isFinite(n) && n > 0 ? n : fallback;
-}
-
-// Calcula xG estimado + probabilidades (vitória casa / empate / vitória fora)
-function computePrediction(statsHome, statsAway){
-  const gh = statsHome.goals, ga = statsAway.goals;
-  const attackHomeAvg  = safeAvg(gh.for.average.home, safeAvg(gh.for.average.total, LEAGUE_AVG_GOALS));
-  const defenseAwayAvg = safeAvg(ga.against.average.away, safeAvg(ga.against.average.total, LEAGUE_AVG_GOALS));
-  const attackAwayAvg  = safeAvg(ga.for.average.away, safeAvg(ga.for.average.total, LEAGUE_AVG_GOALS));
-  const defenseHomeAvg = safeAvg(gh.against.average.home, safeAvg(gh.against.average.total, LEAGUE_AVG_GOALS));
-
-  let xgHome = (attackHomeAvg / LEAGUE_AVG_GOALS) * (defenseAwayAvg / LEAGUE_AVG_GOALS) * LEAGUE_AVG_GOALS;
-  let xgAway = (attackAwayAvg / LEAGUE_AVG_GOALS) * (defenseHomeAvg / LEAGUE_AVG_GOALS) * LEAGUE_AVG_GOALS;
-
-  // Ajuste pelo "momento" (forma recente) de cada equipe no campeonato
-  const fHome = formWinRatio(statsHome.form);
-  const fAway = formWinRatio(statsAway.form);
-  const homeFactor = 1 + (fHome - 0.5) * 0.3;
-  const awayFactor = 1 + (fAway - 0.5) * 0.3;
-  xgHome = Math.max(0.15, xgHome * homeFactor);
-  xgAway = Math.max(0.15, xgAway * awayFactor);
-
-  const MAX_GOALS = 7;
-  let pHome = 0, pDraw = 0, pAway = 0;
-  for(let i=0;i<=MAX_GOALS;i++){
-    for(let j=0;j<=MAX_GOALS;j++){
-      const p = poissonP(i, xgHome) * poissonP(j, xgAway);
-      if(i>j) pHome += p; else if(i===j) pDraw += p; else pAway += p;
-    }
+function normalizeOLD(m, leagueMeta){
+  let scoreHome = 0, scoreAway = 0, minuteFromGoal = null;
+  if(Array.isArray(m.goals) && m.goals.length){
+    const last = m.goals[m.goals.length - 1];
+    scoreHome = last.scoreTeam1 ?? 0; scoreAway = last.scoreTeam2 ?? 0; minuteFromGoal = last.matchMinute ?? null;
+  }else if(Array.isArray(m.matchResults) && m.matchResults.length){
+    const finalRes = m.matchResults.find(r => r.resultTypeID === 2) || m.matchResults[m.matchResults.length-1];
+    scoreHome = finalRes.pointsTeam1 ?? 0; scoreAway = finalRes.pointsTeam2 ?? 0;
   }
-  const total = pHome + pDraw + pAway;
-  pHome/=total; pDraw/=total; pAway/=total;
+
+  let status;
+  if(m.matchIsFinished) status = "FT";
+  else{
+    const kickoff = new Date(m.matchDateTimeUTC).getTime();
+    const now = Date.now();
+    if(now < kickoff) status = "NS";
+    else if(now - kickoff < 130*60000) status = "LIVE";
+    else status = "FT";
+  }
+  const elapsed = (status==="LIVE") ? (minuteFromGoal ?? estimateElapsed(m.matchDateTimeUTC, status)) : (status==="FT" ? 90 : null);
 
   return {
-    xgHome: xgHome, xgAway: xgAway,
-    pHome: Math.round(pHome*100), pDraw: Math.round(pDraw*100), pAway: Math.round(pAway*100)
+    id: "old-" + m.matchID, source:"old", leagueShortcut: leagueMeta.shortcut, approxTime: true,
+    league: { name:leagueMeta.label, country:leagueMeta.country, id:"old-"+leagueMeta.shortcut, logo:null },
+    teams: {
+      home: { id:"old-"+m.team1.teamId, name:m.team1.teamName, logo:m.team1.teamIconUrl },
+      away: { id:"old-"+m.team2.teamId, name:m.team2.teamName, logo:m.team2.teamIconUrl }
+    },
+    goals: { home:scoreHome, away:scoreAway },
+    status, elapsed, kickoff: m.matchDateTimeUTC,
+    goalEvents: m.goals || []
   };
 }
 
-async function getTeamStats(teamId, leagueId, season){
-  const key = teamId + "-" + leagueId + "-" + season;
-  if(statsCache[key]) return statsCache[key];
-  const data = await apiFetch("/teams/statistics", { team: teamId, league: leagueId, season: season });
-  const stats = data.response;
-  statsCache[key] = stats;
-  return stats;
+function normalizeFD(m, code){
+  const meta = FD_COMPETITIONS.find(c => c.code === code);
+  let status;
+  switch(m.status){
+    case "IN_PLAY": status = "LIVE"; break;
+    case "PAUSED": status = "HT"; break;
+    case "FINISHED": status = "FT"; break;
+    case "SCHEDULED": case "TIMED": status = "NS"; break;
+    default: status = "PST";
+  }
+  const elapsed = (status==="LIVE") ? estimateElapsed(m.utcDate, status) : (status==="HT" ? 45 : (status==="FT" ? 90 : null));
+
+  return {
+    id: "fd-" + m.id, source:"fd", compCode: code, approxTime: true,
+    league: { name: meta ? meta.label : (m.competition && m.competition.name), country: meta ? meta.country : "", id:"fd-"+code, logo: m.competition && m.competition.emblem },
+    teams: {
+      home: { id:"fd-"+m.homeTeam.id, name: m.homeTeam.name || m.homeTeam.shortName || "Casa", logo: m.homeTeam.crest },
+      away: { id:"fd-"+m.awayTeam.id, name: m.awayTeam.name || m.awayTeam.shortName || "Fora", logo: m.awayTeam.crest }
+    },
+    goals: { home: (m.score && m.score.fullTime && m.score.fullTime.home) ?? 0, away: (m.score && m.score.fullTime && m.score.fullTime.away) ?? 0 },
+    status, elapsed, kickoff: m.utcDate,
+    halfTime: m.score && m.score.halfTime
+  };
 }
 
 /* ==========================================================
-   ABA: ANÁLISE AO VIVO
+   BUSCA DE PARTIDAS POR DIA / AO VIVO
    ========================================================== */
-async function loadLiveMatches(showSpinner){
-  const listEl = $("#live-list");
-  const errEl = $("#live-error-box");
-  const btn = $("#live-refresh-btn");
-  errEl.innerHTML = "";
-  if(showSpinner) btn.classList.add("spinning");
-
-  try{
-    const data = await apiFetch("/fixtures", { live: "all" });
-    const fixtures = data.response || [];
-    $("#live-updated-at").textContent = "Atualizado às " + formatClock();
-
-    if(!fixtures.length){
-      listEl.innerHTML = "";
-      listEl.appendChild(emptyState(
-        "Nenhuma partida ao vivo agora",
-        "Assim que uma partida começar, ela aparecerá aqui automaticamente."
-      ));
-      return;
-    }
-
-    listEl.innerHTML = "";
-    fixtures.forEach(fx => {
-      listEl.appendChild(renderLiveCard(fx));
-      checkGoalAlert(fx);
-    });
-
-  }catch(e){
-    errEl.innerHTML = "";
-    errEl.appendChild(errorBox(e.message));
-  }finally{
-    if(showSpinner) btn.classList.remove("spinning");
+async function fetchOLDMatchesForOffset(offsetDays){
+  const out = [];
+  for(const lg of OPENLIGA_LEAGUES){
+    try{
+      const data = await fetchOLD("/getmatchdata/" + lg.shortcut);
+      (data || []).forEach(m => {
+        if(isSameLocalDate(m.matchDateTimeUTC, offsetDays)) out.push(normalizeOLD(m, lg));
+      });
+    }catch(e){ /* liga alemã específica indisponível: ignora e segue com as demais */ }
   }
+  return out;
 }
 
-function renderLiveCard(fx){
-  const card = el("div", "match-card");
-  const home = fx.teams.home, away = fx.teams.away;
-  const goalsHome = fx.goals.home ?? 0, goalsAway = fx.goals.away ?? 0;
-  const minute = fx.fixture.status.elapsed;
-
-  card.innerHTML = `
-    <div class="mc-top">
-      <div class="mc-league">
-        <img src="${fx.league.logo}" alt="" onerror="this.style.display='none'">
-        ${escapeHtml(fx.league.name)} · ${escapeHtml(fx.league.round||"")}
-      </div>
-      <div class="mc-minute"><span class="dot"></span>${minute ? minute+"'" : escapeHtml(fx.fixture.status.short)}</div>
-    </div>
-    <div class="mc-teams">
-      <div class="mc-team home">
-        <img src="${home.logo}" alt="" onerror="this.style.display='none'">
-        <span>${escapeHtml(home.name)}</span>
-      </div>
-      <div class="mc-score">${goalsHome} - ${goalsAway}</div>
-      <div class="mc-team away">
-        <img src="${away.logo}" alt="" onerror="this.style.display='none'">
-        <span>${escapeHtml(away.name)}</span>
-      </div>
-    </div>
-    <div class="mc-predict">
-      <div class="mc-predict-head">
-        <span class="ai-tag">◆ IA PREDITIVA</span>
-        <span>Gols esperados (xG)</span>
-      </div>
-      <div class="predict-slot"><div class="predict-loading"><span class="spin-mini"></span> Calculando probabilidades...</div></div>
-    </div>
-  `;
-
-  // Calcula a predição de forma assíncrona (não bloqueia a renderização da lista)
-  computeAndRenderPrediction(fx, card.querySelector(".predict-slot"));
-
-  return card;
-}
-
-async function computeAndRenderPrediction(fx, slotEl){
-  try{
-    const leagueId = fx.league.id, season = fx.league.season;
-    const [statsHome, statsAway] = await Promise.all([
-      getTeamStats(fx.teams.home.id, leagueId, season),
-      getTeamStats(fx.teams.away.id, leagueId, season)
-    ]);
-    const pred = computePrediction(statsHome, statsAway);
-
-    slotEl.innerHTML = `
-      <div class="prob-bar">
-        <span class="home" style="width:${pred.pHome}%"></span>
-        <span class="draw" style="width:${pred.pDraw}%"></span>
-        <span class="away" style="width:${pred.pAway}%"></span>
-      </div>
-      <div class="prob-labels">
-        <span>Casa ${pred.pHome}%</span>
-        <span>Empate ${pred.pDraw}%</span>
-        <span>Fora ${pred.pAway}%</span>
-      </div>
-      <div class="xg-row">
-        <span>xG casa: <b>${pred.xgHome.toFixed(2)}</b></span>
-        <span>Total esperado: <b>${(pred.xgHome+pred.xgAway).toFixed(2)}</b></span>
-        <span>xG fora: <b>${pred.xgAway.toFixed(2)}</b></span>
-      </div>
-    `;
-  }catch(e){
-    slotEl.innerHTML = `<div class="predict-loading" style="color:var(--text-dim)">Estatísticas indisponíveis para esta partida/plano de API.</div>`;
+async function fetchOLDLiveMatches(){
+  const out = [];
+  for(const lg of OPENLIGA_LEAGUES){
+    try{
+      const data = await fetchOLD("/getmatchdata/" + lg.shortcut);
+      (data || []).forEach(m => {
+        const norm = normalizeOLD(m, lg);
+        if(norm.status === "LIVE" || norm.status === "HT") out.push(norm);
+      });
+    }catch(e){ /* ignora */ }
   }
+  return out;
 }
 
-function checkGoalAlert(fx){
-  const id = fx.fixture.id;
-  const gh = fx.goals.home ?? 0, ga = fx.goals.away ?? 0;
-  const prev = previousGoals[id];
-  if(prev && settings.goalAlert && (gh > prev.home || ga > prev.away)){
-    const scorer = gh > prev.home ? fx.teams.home.name : fx.teams.away.name;
-    showToast("⚽ GOL! " + scorer + " " + gh + " - " + ga);
-    if(settings.sound) playBeep();
-    if(settings.browserNotif && "Notification" in window && Notification.permission === "granted"){
-      new Notification("RADAR MUNDIAL — Gol!", { body: fx.teams.home.name + " " + gh + " x " + ga + " " + fx.teams.away.name });
-    }
+async function fetchFDMatchesForOffset(offsetDays, competitionCodes){
+  const out = [];
+  const d = dateStr(offsetDays);
+  for(const code of competitionCodes){
+    try{
+      const data = await fetchFD("/competitions/" + code + "/matches", { dateFrom:d, dateTo:d });
+      (data.matches || []).forEach(m => out.push(normalizeFD(m, code)));
+      await sleep(120); // espaçamento simples para não rajar o limite de 10 req/min
+    }catch(e){ /* campeonato específico indisponível: ignora e segue com os demais */ }
   }
-  previousGoals[id] = { home: gh, away: ga };
+  return out;
 }
 
-function playBeep(){
-  try{
-    const ctx = new (window.AudioContext || window.webkitAudioContext)();
-    const osc = ctx.createOscillator();
-    const gain = ctx.createGain();
-    osc.type = "sine";
-    osc.frequency.value = 880;
-    gain.gain.setValueAtTime(0.001, ctx.currentTime);
-    gain.gain.exponentialRampToValueAtTime(0.25, ctx.currentTime + 0.02);
-    gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.5);
-    osc.connect(gain); gain.connect(ctx.destination);
-    osc.start(); osc.stop(ctx.currentTime + 0.5);
-  }catch(e){ /* ambiente sem suporte a áudio */ }
-}
-
-function scheduleLiveRefresh(){
-  if(liveTimer) clearInterval(liveTimer);
-  liveTimer = setInterval(() => {
-    if(getActiveTab() === "live") loadLiveMatches(false);
-  }, settings.refreshInterval * 1000);
-}
-
-/* ==========================================================
-   ABAS: JOGOS DE HOJE / AMANHÃ
-   ========================================================== */
 async function loadFixturesForDay(offsetDays, listId, errId, dateLabelId){
-  const listEl = $("#" + listId);
-  const errEl = $("#" + errId);
-  errEl.innerHTML = "";
-  listEl.innerHTML = "";
+  const listEl = $("#"+listId), errEl = $("#"+errId);
+  errEl.innerHTML = ""; listEl.innerHTML = "";
   for(let i=0;i<4;i++) listEl.appendChild(el("div","skeleton"));
 
   const label = formatDateLabel(offsetDays);
-  $("#" + dateLabelId).textContent = label.charAt(0).toUpperCase() + label.slice(1);
+  $("#"+dateLabelId).textContent = label.charAt(0).toUpperCase() + label.slice(1);
 
-  try{
-    const data = await apiFetch("/fixtures", { date: dateStr(offsetDays) });
-    const fixtures = data.response || [];
-    listEl.innerHTML = "";
+  const matches = [];
+  const errors = [];
 
-    if(!fixtures.length){
-      listEl.appendChild(emptyState("Nenhum jogo encontrado", "Não há partidas cadastradas para esta data no plano de API atual."));
-      return;
-    }
+  try{ matches.push(...await fetchOLDMatchesForOffset(offsetDays)); }
+  catch(e){ errors.push(e.message); }
 
-    // Agrupa por campeonato
-    const groups = {};
-    fixtures.forEach(fx => {
-      const key = fx.league.id;
-      if(!groups[key]) groups[key] = { league: fx.league, items: [] };
-      groups[key].items.push(fx);
-    });
-
-    Object.values(groups)
-      .sort((a,b) => a.league.name.localeCompare(b.league.name))
-      .forEach(group => {
-        const wrap = el("div", "league-group");
-        wrap.innerHTML = `<div class="league-title"><img src="${group.league.logo}" alt="" onerror="this.style.display='none'">${escapeHtml(group.league.name)} — ${escapeHtml(group.league.country||"")}</div>`;
-        group.items.forEach(fx => wrap.appendChild(renderFixtureRow(fx)));
-        listEl.appendChild(wrap);
-      });
-
-  }catch(e){
-    listEl.innerHTML = "";
-    errEl.appendChild(errorBox(e.message));
+  if(settings.fdToken){
+    try{ matches.push(...await fetchFDMatchesForOffset(offsetDays, FD_COMPETITIONS.map(c=>c.code))); }
+    catch(e){ errors.push(e.message); }
   }
+
+  listEl.innerHTML = "";
+
+  if(!matches.length){
+    if(errors.length) errEl.appendChild(errorBox(Array.from(new Set(errors)).join(" | "), () => loadFixturesForDay(offsetDays, listId, errId, dateLabelId)));
+    if(!settings.fdToken){
+      listEl.appendChild(warnBox('Só a Alemanha (OpenLigaDB) está ativa no momento. Adicione um token gratuito do football-data.org em Configuração para ver Brasileirão, Premier League, Ligue 1 e mais.'));
+    }
+    listEl.appendChild(emptyState("Nenhum jogo encontrado", "Não há partidas cadastradas para esta data nas fontes ativadas."));
+    return;
+  }
+
+  if(!settings.fdToken){
+    listEl.appendChild(warnBox('Mostrando apenas jogos da Alemanha (OpenLigaDB). Adicione um token gratuito do football-data.org em Configuração para incluir Brasileirão, Premier League, Ligue 1 e outros campeonatos.'));
+  }
+  if(errors.length){
+    listEl.appendChild(warnBox('Alguns campeonatos não puderam ser carregados agora: ' + Array.from(new Set(errors)).join(" | ")));
+  }
+
+  const groups = {};
+  matches.forEach(m => { const k=m.league.id; if(!groups[k]) groups[k]={league:m.league,items:[]}; groups[k].items.push(m); });
+
+  Object.values(groups).sort((a,b)=>a.league.name.localeCompare(b.league.name)).forEach(group => {
+    const wrap = el("div","league-group");
+    wrap.innerHTML = `<div class="league-title">${group.league.logo?`<img src="${group.league.logo}" alt="" onerror="this.style.display='none'">`:"⚽"} ${escapeHtml(group.league.name)} — ${escapeHtml(group.league.country||"")}</div>`;
+    group.items.sort((a,b)=> new Date(a.kickoff)-new Date(b.kickoff)).forEach(m => wrap.appendChild(renderFixtureRow(m)));
+    listEl.appendChild(wrap);
+  });
 }
 
-function renderFixtureRow(fx){
-  const btn = el("button", "fixture-row");
-  btn.type = "button";
-  const status = fx.fixture.status.short;
-  const isLive = ["1H","2H","HT","ET","P","LIVE"].includes(status);
-  const isFinished = ["FT","AET","PEN"].includes(status);
+function renderFixtureRow(m){
+  const btn = el("button","fixture-row"); btn.type="button";
+  const isLive = m.status==="LIVE" || m.status==="HT";
+  const isFinished = m.status==="FT";
   const statusClass = isLive ? "live" : (isFinished ? "ft" : "");
-  const statusLabel = isLive ? (fx.fixture.status.elapsed ? fx.fixture.status.elapsed+"'" : "AO VIVO")
-                     : isFinished ? "ENCERRADO" : status;
+  const statusLabel = isLive ? (m.elapsed!=null ? "~"+m.elapsed+"'" : "AO VIVO") : (isFinished ? "ENCERRADO" : "A COMEÇAR");
 
   const scoreHtml = (isLive || isFinished)
-    ? `${fx.goals.home ?? 0}<br>${fx.goals.away ?? 0}`
+    ? `${m.goals.home}<br>${m.goals.away}`
     : `<span class="fx-status ${statusClass}">${escapeHtml(statusLabel)}</span>`;
 
   btn.innerHTML = `
-    <div class="fx-time">${formatTime(fx.fixture.date)}</div>
+    <div class="fx-time">${formatTime(m.kickoff)}</div>
     <div class="fx-teams">
-      <div class="fx-team-line"><img src="${fx.teams.home.logo}" alt="" onerror="this.style.display='none'"><span>${escapeHtml(fx.teams.home.name)}</span></div>
-      <div class="fx-team-line"><img src="${fx.teams.away.logo}" alt="" onerror="this.style.display='none'"><span>${escapeHtml(fx.teams.away.name)}</span></div>
+      <div class="fx-team-line">${m.teams.home.logo?`<img src="${m.teams.home.logo}" alt="" onerror="this.style.display='none'">`:""}<span>${escapeHtml(m.teams.home.name)}</span></div>
+      <div class="fx-team-line">${m.teams.away.logo?`<img src="${m.teams.away.logo}" alt="" onerror="this.style.display='none'">`:""}<span>${escapeHtml(m.teams.away.name)}</span></div>
     </div>
     <div class="fx-score-col">${scoreHtml}</div>
-    <div class="chev">
-      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 6l6 6-6 6"/></svg>
-    </div>
+    <div class="chev"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 6l6 6-6 6"/></svg></div>
   `;
-  btn.dataset.search = (fx.teams.home.name + " " + fx.teams.away.name + " " + fx.league.name).toLowerCase();
-  btn.addEventListener("click", () => openMatchModal(fx));
+  btn.dataset.search = (m.teams.home.name + " " + m.teams.away.name + " " + m.league.name).toLowerCase();
+  btn.addEventListener("click", () => openMatchModal(m));
   return btn;
 }
 
 function filterList(listId, searchId){
-  const q = $("#" + searchId).value.trim().toLowerCase();
-  $all("#" + listId + " .fixture-row").forEach(row => {
-    row.style.display = row.dataset.search.includes(q) ? "" : "none";
-  });
-  $all("#" + listId + " .league-group").forEach(group => {
+  const q = $("#"+searchId).value.trim().toLowerCase();
+  $all("#"+listId+" .fixture-row").forEach(row => { row.style.display = row.dataset.search.includes(q) ? "" : "none"; });
+  $all("#"+listId+" .league-group").forEach(group => {
     const visible = $all(".fixture-row", group).some(r => r.style.display !== "none");
     group.style.display = visible ? "" : "none";
   });
 }
 
 /* ==========================================================
-   MODAL DE ESTATÍSTICAS DA PARTIDA
+   ABA: ANÁLISE AO VIVO
    ========================================================== */
-async function openMatchModal(fx){
-  const overlay = $("#modal-overlay");
-  const body = $("#modal-body");
-  $("#modal-title").textContent = fx.teams.home.name + " x " + fx.teams.away.name;
+async function loadLiveMatches(manual){
+  const listEl = $("#live-list"), errEl = $("#live-error-box"), btn = $("#live-refresh-btn");
+  errEl.innerHTML = "";
+  if(manual) btn.classList.add("spinning");
 
-  body.innerHTML = `
-    <div class="modal-score-line">
-      <div class="modal-team"><img src="${fx.teams.home.logo}" onerror="this.style.display='none'"><span>${escapeHtml(fx.teams.home.name)}</span></div>
-      <div class="modal-score">${fx.goals.home ?? "-"} : ${fx.goals.away ?? "-"}</div>
-      <div class="modal-team"><img src="${fx.teams.away.logo}" onerror="this.style.display='none'"><span>${escapeHtml(fx.teams.away.name)}</span></div>
-    </div>
-    <div class="predict-loading"><span class="spin-mini"></span> Carregando estatísticas...</div>
-  `;
-  overlay.classList.add("open");
+  const matches = [];
+  const errors = [];
 
-  const notStarted = fx.fixture.status.short === "NS";
-  if(notStarted){
-    body.querySelector(".predict-loading").outerHTML =
-      `<div class="disclaimer">Esta partida ainda não começou. Estatísticas em tempo real ficam disponíveis assim que o jogo tiver início.<br><br>
-      <b>Local:</b> ${escapeHtml(fx.fixture.venue.name || "a definir")}<br>
-      <b>Horário:</b> ${formatTime(fx.fixture.date)}</div>`;
+  try{ matches.push(...await fetchOLDLiveMatches()); }
+  catch(e){ errors.push(e.message); }
+
+  if(settings.fdToken){
+    const codesToCheck = (manual || hotFdCompetitions.size===0) ? FD_COMPETITIONS.map(c=>c.code) : Array.from(hotFdCompetitions);
+    try{
+      const found = await fetchFDMatchesForOffset(0, codesToCheck);
+      const live = found.filter(m => m.status==="LIVE" || m.status==="HT");
+      matches.push(...live);
+      hotFdCompetitions = new Set(live.map(m => m.compCode));
+    }catch(e){ errors.push(e.message); }
+  }
+
+  $("#live-updated-at").textContent = "Atualizado às " + formatClock();
+  updateLiveCountBadge(matches.length);
+
+  if(errors.length) errEl.appendChild(errorBox(Array.from(new Set(errors)).join(" | "), () => loadLiveMatches(true)));
+
+  if(!matches.length){
+    listEl.innerHTML = "";
+    if(!settings.fdToken){
+      listEl.appendChild(warnBox('Só a Alemanha (OpenLigaDB) está ativa. Adicione um token gratuito do football-data.org em Configuração para acompanhar mais campeonatos ao vivo.'));
+    }
+    listEl.appendChild(emptyState("Nenhuma partida ao vivo agora", "Assim que uma partida começar nas fontes ativadas, ela aparecerá aqui automaticamente."));
+    if(manual) btn.classList.remove("spinning");
     return;
   }
 
-  try{
-    const data = await apiFetch("/fixtures/statistics", { fixture: fx.fixture.id });
-    const resp = data.response || [];
-    const loadingBox = body.querySelector(".predict-loading");
-    if(loadingBox) loadingBox.remove();
+  listEl.innerHTML = "";
+  matches.forEach(m => { const goalInfo = checkGoalAlert(m); listEl.appendChild(renderLiveCard(m, goalInfo)); });
 
-    if(!resp.length){
-      body.appendChild(el("div","disclaimer","Estatísticas detalhadas ainda não disponíveis para esta partida."));
-      return;
-    }
-
-    const homeStats = resp[0].statistics || [];
-    const awayStats = resp[1] ? resp[1].statistics || [] : [];
-    const statsWrap = el("div");
-
-    homeStats.forEach((stat, idx) => {
-      const awayVal = awayStats[idx] ? awayStats[idx].value : null;
-      statsWrap.appendChild(renderStatRow(stat.type, stat.value, awayVal));
-    });
-
-    body.appendChild(statsWrap);
-  }catch(e){
-    const loadingBox = body.querySelector(".predict-loading");
-    if(loadingBox) loadingBox.outerHTML = `<div class="error-box">${escapeHtml(e.message)}</div>`;
-  }
+  if(manual) btn.classList.remove("spinning");
 }
 
-function statToNumber(v){
-  if(v === null || v === undefined) return 0;
-  if(typeof v === "string" && v.includes("%")) return parseFloat(v);
-  const n = parseFloat(v);
-  return isFinite(n) ? n : 0;
+function updateLiveCountBadge(n){
+  const b = $("#live-count-badge");
+  if(!b) return;
+  if(n > 0){ b.textContent = String(n); b.style.display = "inline-block"; }
+  else{ b.style.display = "none"; }
 }
 
-function renderStatRow(label, homeVal, awayVal){
-  const hn = statToNumber(homeVal), an = statToNumber(awayVal);
-  const total = hn + an || 1;
-  const hPct = Math.round((hn/total)*100);
-  const aPct = 100 - hPct;
-  const row = el("div", "stat-row");
-  row.innerHTML = `
-    <div class="val">${homeVal ?? 0}</div>
-    <div class="stat-bar-wrap">
-      <div class="stat-bar-track"><div class="stat-bar-fill" style="width:${hPct}%"></div></div>
+function renderLiveCard(m, goalInfo){
+  const card = el("div","match-card");
+  const minuteLabel = m.elapsed!=null ? "~"+m.elapsed+"'" : escapeHtml(m.status);
+  const justScored = !!(goalInfo && (goalInfo.homeScored || goalInfo.awayScored));
+
+  card.innerHTML = `
+    <div class="mc-top">
+      <div class="mc-league">${m.league.logo?`<img src="${m.league.logo}" alt="" onerror="this.style.display='none'">`:"⚽"} ${escapeHtml(m.league.name)}</div>
+      <div class="mc-minute" title="Tempo estimado"><span class="dot"></span>${minuteLabel}</div>
     </div>
-    <div class="lbl">${escapeHtml(label)}</div>
-    <div class="stat-bar-wrap">
-      <div class="stat-bar-track right"><div class="stat-bar-fill away" style="width:${aPct}%"></div></div>
+    <div class="mc-teams">
+      <div class="mc-team home">${m.teams.home.logo?`<img src="${m.teams.home.logo}" alt="" onerror="this.style.display='none'">`:""}<span>${escapeHtml(m.teams.home.name)}</span></div>
+      <div class="mc-score${justScored ? ' goal-flash' : ''}">${m.goals.home} - ${m.goals.away}</div>
+      <div class="mc-team away">${m.teams.away.logo?`<img src="${m.teams.away.logo}" alt="" onerror="this.style.display='none'">`:""}<span>${escapeHtml(m.teams.away.name)}</span></div>
     </div>
-    <div class="val">${awayVal ?? 0}</div>
+    <div class="mc-predict">
+      <div class="mc-predict-head">
+        <span class="ai-tag">◆ IA PREDITIVA</span>
+        <span class="live-label"><span class="mini-dot"></span>Chance de vitória</span>
+      </div>
+      <div class="predict-slot"></div>
+    </div>
   `;
-  return row;
+  renderPredictionBlock(m, card.querySelector(".predict-slot"));
+  return card;
 }
 
 /* ==========================================================
-   HELPERS DE UI (empty/error state, toasts)
+   MODELO PREDITIVO — chance de vitória em tempo real
+   ========================================================== */
+function factorial(n){ let r=1; for(let i=2;i<=n;i++) r*=i; return r; }
+function poissonP(k, lambda){ return (Math.pow(lambda,k)*Math.exp(-lambda))/factorial(k); }
+function formWinRatio(formStr){
+  if(!formStr) return 0.5;
+  const chars = formStr.slice(-5).split("");
+  if(!chars.length) return 0.5;
+  let score = 0; chars.forEach(c => { if(c==="W") score+=1; else if(c==="D") score+=0.5; });
+  return score/chars.length;
+}
+
+// Calcula a chance de vitória considerando o placar e o tempo já jogado:
+// projeta apenas os gols esperados no tempo RESTANTE da partida.
+function computeInPlayWinProbs(m, xgHomeFull, xgAwayFull){
+  let elapsed = m.elapsed; if(elapsed===null || elapsed===undefined) elapsed = 0;
+  elapsed = Math.min(elapsed, 90);
+  const remainingFraction = Math.max(0, Math.min(1, (90-elapsed)/90));
+
+  const remXgHome = xgHomeFull * remainingFraction;
+  const remXgAway = xgAwayFull * remainingFraction;
+  const diff = (m.goals.home||0) - (m.goals.away||0);
+
+  const MAX_GOALS = 6;
+  let pHome=0, pDraw=0, pAway=0;
+  for(let i=0;i<=MAX_GOALS;i++){
+    for(let j=0;j<=MAX_GOALS;j++){
+      const p = poissonP(i, remXgHome) * poissonP(j, remXgAway);
+      const finalDiff = diff + i - j;
+      if(finalDiff>0) pHome+=p; else if(finalDiff===0) pDraw+=p; else pAway+=p;
+    }
+  }
+  const total = (pHome+pDraw+pAway) || 1;
+  pHome/=total; pDraw/=total; pAway/=total;
+
+  let rHome=Math.round(pHome*100), rDraw=Math.round(pDraw*100), rAway=Math.round(pAway*100);
+  const rest = 100-(rHome+rDraw+rAway);
+  if(rest!==0){
+    if(rHome>=rDraw && rHome>=rAway) rHome+=rest; else if(rAway>=rDraw) rAway+=rest; else rDraw+=rest;
+  }
+  return { pHome:rHome, pDraw:rDraw, pAway:rAway };
+}
+
+function renderPredictionBlock(m, slotEl){
+  let base = predictionBaseCache[m.id];
+  if(!base){ base = { xgHome:DEFAULT_XG_HOME, xgAway:DEFAULT_XG_AWAY, refined:false }; predictionBaseCache[m.id]=base; }
+
+  const probs = computeInPlayWinProbs(m, base.xgHome, base.xgAway);
+  const homeName = shortName(m.teams.home.name), awayName = shortName(m.teams.away.name);
+
+  slotEl.innerHTML = `
+    <div class="prob-bar">
+      <span class="home" style="width:${probs.pHome}%"></span>
+      <span class="draw" style="width:${probs.pDraw}%"></span>
+      <span class="away" style="width:${probs.pAway}%"></span>
+    </div>
+    <div class="prob-labels">
+      <span title="${escapeHtml(m.teams.home.name)}">${escapeHtml(homeName)} ${probs.pHome}%</span>
+      <span>Empate ${probs.pDraw}%</span>
+      <span title="${escapeHtml(m.teams.away.name)}">${escapeHtml(awayName)} ${probs.pAway}%</span>
+    </div>
+    ${base.refined
+      ? '<div class="fallback-note">Previsão refinada com o desempenho recente de cada equipe.</div>'
+      : (canRefine(m) ? '<button type="button" class="calc-predict-btn refine-btn">Refinar previsão</button>' : '')}
+  `;
+  if(!base.refined && canRefine(m)){
+    slotEl.querySelector(".refine-btn").addEventListener("click", () => refinePrediction(m, slotEl));
+  }
+}
+
+function canRefine(m){ return m.source==="fd" ? !!settings.fdToken : true; }
+
+async function fetchRecentGoalsForTeam(m, isHome){
+  const team = isHome ? m.teams.home : m.teams.away;
+  if(m.source === "fd"){
+    const rawId = team.id.replace("fd-","");
+    const data = await fetchFD("/teams/"+rawId+"/matches", { status:"FINISHED", limit:8 });
+    return (data.matches || []).map(mm => {
+      const isTeamHome = String(mm.homeTeam.id) === rawId;
+      const scored = (isTeamHome ? mm.score.fullTime.home : mm.score.fullTime.away) ?? 0;
+      const conceded = (isTeamHome ? mm.score.fullTime.away : mm.score.fullTime.home) ?? 0;
+      return { scored, conceded };
+    });
+  }else{
+    const rawId = team.id.replace("old-","");
+    const data = await fetchOLD("/getlastmatchesbyleagueteam/"+m.leagueShortcut+"/"+rawId+"/8");
+    return (data || []).filter(mm => mm.matchIsFinished).map(mm => {
+      const isTeamHome = String(mm.team1.teamId) === rawId;
+      const finalRes = (mm.matchResults||[]).find(r=>r.resultTypeID===2) || (mm.matchResults||[])[(mm.matchResults||[]).length-1] || {pointsTeam1:0,pointsTeam2:0};
+      const p1 = finalRes.pointsTeam1 ?? 0, p2 = finalRes.pointsTeam2 ?? 0;
+      return { scored: isTeamHome?p1:p2, conceded: isTeamHome?p2:p1 };
+    });
+  }
+}
+
+function xgFromRecent(list){
+  if(!list || !list.length) return null;
+  const n = list.length;
+  const avgFor = list.reduce((s,x)=>s+x.scored,0)/n;
+  const avgAgainst = list.reduce((s,x)=>s+x.conceded,0)/n;
+  const form = list.map(x => x.scored>x.conceded?"W":(x.scored===x.conceded?"D":"L")).slice(-5).join("");
+  return { avgFor, avgAgainst, form };
+}
+
+async function refinePrediction(m, slotEl){
+  const btn = slotEl.querySelector(".refine-btn");
+  if(btn){ btn.disabled = true; btn.textContent = "Calculando..."; }
+  try{
+    const [homeList, awayList] = await Promise.all([ fetchRecentGoalsForTeam(m, true), fetchRecentGoalsForTeam(m, false) ]);
+    const h = xgFromRecent(homeList), a = xgFromRecent(awayList);
+    if(!h || !a) throw new Error("Dados recentes insuficientes.");
+    const fHome = formWinRatio(h.form), fAway = formWinRatio(a.form);
+    let xgHome = ((h.avgFor + a.avgAgainst)/2) * (1 + (fHome-0.5)*0.3);
+    let xgAway = ((a.avgFor + h.avgAgainst)/2) * (1 + (fAway-0.5)*0.3);
+    xgHome = Math.max(0.15, xgHome); xgAway = Math.max(0.15, xgAway);
+    predictionBaseCache[m.id] = { xgHome, xgAway, refined:true };
+    renderPredictionBlock(m, slotEl);
+  }catch(e){
+    if(btn){ btn.disabled = false; btn.textContent = "Tentar novamente"; }
+  }
+}
+
+/* ==========================================================
+   ALERTA DE GOLS
+   ========================================================== */
+function checkGoalAlert(m){
+  const prev = previousGoals[m.id];
+  const gh = m.goals.home||0, ga = m.goals.away||0;
+  const homeScored = !!prev && gh>prev.home;
+  const awayScored = !!prev && ga>prev.away;
+  if(prev && settings.goalAlert && (homeScored || awayScored)){
+    const scorer = homeScored ? m.teams.home.name : m.teams.away.name;
+    showToast("⚽ GOL! " + scorer + " " + gh + " - " + ga);
+    if(settings.sound) playBeep();
+    if(settings.browserNotif && "Notification" in window && Notification.permission==="granted"){
+      new Notification("RADAR FUTEBOL — Gol!", { body: m.teams.home.name+" "+gh+" x "+ga+" "+m.teams.away.name });
+    }
+  }
+  previousGoals[m.id] = { home:gh, away:ga };
+  return { homeScored, awayScored };
+}
+function playBeep(){
+  try{
+    const ctx = new (window.AudioContext||window.webkitAudioContext)();
+    const osc = ctx.createOscillator(), gain = ctx.createGain();
+    osc.type="sine"; osc.frequency.value=880;
+    gain.gain.setValueAtTime(0.001, ctx.currentTime);
+    gain.gain.exponentialRampToValueAtTime(0.25, ctx.currentTime+0.02);
+    gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime+0.5);
+    osc.connect(gain); gain.connect(ctx.destination); osc.start(); osc.stop(ctx.currentTime+0.5);
+  }catch(e){}
+}
+
+function scheduleLiveRefresh(){
+  if(liveTimer) clearInterval(liveTimer);
+  liveTimer = setInterval(() => {
+    if(getActiveTab()==="live" && !document.hidden) loadLiveMatches(false);
+  }, settings.refreshInterval*1000);
+}
+
+/* ==========================================================
+   MODAL DE DETALHES DA PARTIDA
+   ========================================================== */
+function openMatchModal(m){
+  const overlay = $("#modal-overlay"), body = $("#modal-body");
+  $("#modal-title").textContent = m.teams.home.name + " x " + m.teams.away.name;
+
+  const sourceLabel = m.source==="old" ? "OpenLigaDB (Alemanha)" : "football-data.org";
+  let html = `
+    <div class="source-badge">Fonte: <b>${escapeHtml(sourceLabel)}</b></div>
+    <div class="modal-score-line">
+      <div class="modal-team">${m.teams.home.logo?`<img src="${m.teams.home.logo}" onerror="this.style.display='none'">`:""}<span>${escapeHtml(m.teams.home.name)}</span></div>
+      <div class="modal-score">${m.status==="NS" ? "-- : --" : m.goals.home+" : "+m.goals.away}</div>
+      <div class="modal-team">${m.teams.away.logo?`<img src="${m.teams.away.logo}" onerror="this.style.display='none'">`:""}<span>${escapeHtml(m.teams.away.name)}</span></div>
+    </div>
+    <div class="modal-info-row"><span>Campeonato</span><span>${escapeHtml(m.league.name)}</span></div>
+    <div class="modal-info-row"><span>Horário</span><span>${formatTime(m.kickoff)}</span></div>
+    <div class="modal-info-row"><span>Status</span><span>${m.status==="LIVE"?"Ao vivo (~"+m.elapsed+"')":m.status==="HT"?"Intervalo":m.status==="FT"?"Encerrada":"A começar"}</span></div>
+  `;
+  if(m.halfTime && (m.halfTime.home!=null)){
+    html += `<div class="modal-info-row"><span>Intervalo</span><span>${m.halfTime.home} : ${m.halfTime.away}</span></div>`;
+  }
+  if(m.goalEvents && m.goalEvents.length){
+    html += `<div class="goal-timeline"><div class="settings-desc" style="margin-bottom:6px;">Gols da partida</div>`;
+    m.goalEvents.forEach(g => {
+      html += `<div class="goal-item"><span class="gmin">${g.matchMinute!=null?g.matchMinute+"'":"—"}</span><span>${escapeHtml(g.goalGetterName||"Gol")} — ${g.scoreTeam1}:${g.scoreTeam2}</span></div>`;
+    });
+    html += `</div>`;
+  }else if(m.status==="NS"){
+    html += `<div class="disclaimer" style="margin-top:12px;">Esta partida ainda não começou.</div>`;
+  }else{
+    html += `<div class="disclaimer" style="margin-top:12px;">Estatísticas detalhadas (posse de bola, finalizações, escanteios) não estão disponíveis nas fontes públicas gratuitas usadas por este app.</div>`;
+  }
+
+  body.innerHTML = html;
+  overlay.classList.add("open");
+}
+function closeModal(){ $("#modal-overlay").classList.remove("open"); }
+
+/* ==========================================================
+   HELPERS DE UI
    ========================================================== */
 function emptyState(title, sub){
-  const box = el("div", "state-box");
-  box.innerHTML = `
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><circle cx="12" cy="12" r="9"/><path d="M9 10h.01M15 10h.01M9 16c1-1 5-1 6 0"/></svg>
-    <p class="big">${escapeHtml(title)}</p>
-    <p>${escapeHtml(sub)}</p>
-  `;
+  const box = el("div","state-box");
+  box.innerHTML = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><circle cx="12" cy="12" r="9"/><path d="M9 10h.01M15 10h.01M9 16c1-1 5-1 6 0"/></svg><p class="big">${escapeHtml(title)}</p><p>${escapeHtml(sub)}</p>`;
   return box;
 }
-function errorBox(msg){
-  const box = el("div", "error-box");
-  box.textContent = "Não foi possível carregar os dados: " + msg;
+function errorBox(msg, retryFn){
+  const box=el("div","error-box");
+  box.innerHTML = `<div>Não foi possível carregar alguns dados: ${escapeHtml(msg)}</div>`;
+  if(retryFn){
+    const btn = el("button","calc-predict-btn");
+    btn.style.marginTop="8px"; btn.style.color="var(--danger)"; btn.style.borderColor="rgba(255,92,92,.4)";
+    btn.type="button"; btn.textContent="Tentar novamente";
+    btn.addEventListener("click", retryFn);
+    box.appendChild(btn);
+  }
   return box;
 }
+function warnBox(msg){ const box=el("div","warn-box"); box.textContent=msg; return box; }
 function showToast(msg){
-  const c = $("#toast-container");
-  const t = el("div", "toast");
-  t.innerHTML = `<span class="dot"></span>${escapeHtml(msg)}`;
+  const c=$("#toast-container"); const t=el("div","toast"); t.innerHTML=`<span class="dot"></span>${escapeHtml(msg)}`;
   c.appendChild(t);
-  setTimeout(() => { t.style.opacity = "0"; t.style.transition="opacity .3s"; setTimeout(()=>t.remove(), 300); }, 4500);
+  setTimeout(()=>{ t.style.opacity="0"; t.style.transition="opacity .3s"; setTimeout(()=>t.remove(),300); }, 4500);
 }
 
 /* ==========================================================
    NAVEGAÇÃO ENTRE ABAS
    ========================================================== */
-function getActiveTab(){
-  const btn = $all(".tab-btn").find(b => b.getAttribute("aria-selected") === "true");
-  return btn ? btn.dataset.tab : "live";
-}
+function getActiveTab(){ const b=$all(".tab-btn").find(x=>x.getAttribute("aria-selected")==="true"); return b?b.dataset.tab:"live"; }
 function activateTab(name){
-  $all(".tab-btn").forEach(b => b.setAttribute("aria-selected", b.dataset.tab === name ? "true" : "false"));
-  $all(".tab-panel").forEach(p => p.classList.remove("active"));
-  $("#panel-" + name).classList.add("active");
-
-  if(name === "live"){
-    loadLiveMatches(false);
-  }else if(name === "today" && !loadedOnce.today){
-    loadedOnce.today = true;
-    loadFixturesForDay(0, "today-list", "today-error-box", "today-date-label");
-  }else if(name === "tomorrow" && !loadedOnce.tomorrow){
-    loadedOnce.tomorrow = true;
-    loadFixturesForDay(1, "tomorrow-list", "tomorrow-error-box", "tomorrow-date-label");
-  }
+  $all(".tab-btn").forEach(b=>b.setAttribute("aria-selected", b.dataset.tab===name?"true":"false"));
+  $all(".tab-panel").forEach(p=>p.classList.remove("active"));
+  $("#panel-"+name).classList.add("active");
+  if(name==="live") loadLiveMatches(false);
+  else if(name==="today" && !loadedOnce.today){ loadedOnce.today=true; loadFixturesForDay(0,"today-list","today-error-box","today-date-label"); }
+  else if(name==="tomorrow" && !loadedOnce.tomorrow){ loadedOnce.tomorrow=true; loadFixturesForDay(1,"tomorrow-list","tomorrow-error-box","tomorrow-date-label"); }
 }
 
 /* ==========================================================
@@ -1101,70 +1066,109 @@ function activateTab(name){
    ========================================================== */
 function applyTheme(){
   document.documentElement.setAttribute("data-theme", settings.theme);
-  $all("#theme-seg .seg-btn").forEach(b => b.classList.toggle("active", b.dataset.theme === settings.theme));
+  $all("#theme-seg .seg-btn").forEach(b=>b.classList.toggle("active", b.dataset.theme===settings.theme));
   const icon = $("#theme-icon");
-  icon.innerHTML = settings.theme === "dark"
+  icon.innerHTML = settings.theme==="dark"
     ? '<circle cx="12" cy="12" r="5"/><path d="M12 1v2M12 21v2M4.2 4.2l1.4 1.4M18.4 18.4l1.4 1.4M1 12h2M21 12h2M4.2 19.8l1.4-1.4M18.4 5.6l1.4-1.4"/>'
     : '<path d="M21 12.8A9 9 0 1111.2 3a7 7 0 009.8 9.8z"/>';
+}
+
+/* ==========================================================
+   PWA — manifest + service worker (funciona plenamente apenas
+   quando o arquivo é publicado em um site com HTTPS)
+   ========================================================== */
+function setupPwa(){
+  try{
+    const manifest = {
+      name: "RADAR FUTEBOL", short_name: "RADAR FUTEBOL", start_url: ".", display: "standalone",
+      background_color: "#0A0E13", theme_color: "#0A0E13",
+      icons: [{ src: "data:image/svg+xml;utf8," + encodeURIComponent("<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 192 192'><rect width='192' height='192' rx='34' fill='%230A0E13'/><circle cx='96' cy='96' r='30' fill='%2339FF9C'/></svg>"), sizes:"192x192", type:"image/svg+xml" }]
+    };
+    const manifestBlob = new Blob([JSON.stringify(manifest)], { type:"application/manifest+json" });
+    $("#pwa-manifest").href = URL.createObjectURL(manifestBlob);
+
+    if("serviceWorker" in navigator && window.isSecureContext){
+      const swCode = "self.addEventListener('fetch', function(){});";
+      const swBlob = new Blob([swCode], { type:"application/javascript" });
+      navigator.serviceWorker.register(URL.createObjectURL(swBlob)).catch(function(){});
+    }
+  }catch(e){ /* ambiente sem suporte a PWA: segue normalmente sem instalação */ }
 }
 
 /* ==========================================================
    INICIALIZAÇÃO
    ========================================================== */
 function init(){
-  // Tabs
   $all(".tab-btn").forEach(btn => btn.addEventListener("click", () => activateTab(btn.dataset.tab)));
 
-  // Tema (topo + configurações)
   applyTheme();
-  $("#theme-toggle").addEventListener("click", () => {
-    settings.theme = settings.theme === "dark" ? "light" : "dark";
-    saveSettings(); applyTheme();
-  });
-  $all("#theme-seg .seg-btn").forEach(btn => btn.addEventListener("click", () => {
-    settings.theme = btn.dataset.theme; saveSettings(); applyTheme();
-  }));
+  $("#theme-toggle").addEventListener("click", () => { settings.theme = settings.theme==="dark"?"light":"dark"; saveSettings(); applyTheme(); });
+  $all("#theme-seg .seg-btn").forEach(btn => btn.addEventListener("click", () => { settings.theme = btn.dataset.theme; saveSettings(); applyTheme(); }));
 
-  // Configurações
   $("#setting-goal-alert").checked = settings.goalAlert;
   $("#setting-sound").checked = settings.sound;
   $("#setting-browser-notif").checked = settings.browserNotif;
   $("#setting-refresh").value = String(settings.refreshInterval);
-  $("#key-preview").textContent = API_KEY.slice(0,6) + "••••••••" + API_KEY.slice(-4);
+  $("#fd-token-input").value = settings.fdToken;
+  updateFdTokenStatus();
 
   $("#setting-goal-alert").addEventListener("change", e => { settings.goalAlert = e.target.checked; saveSettings(); });
   $("#setting-sound").addEventListener("change", e => { settings.sound = e.target.checked; saveSettings(); });
   $("#setting-browser-notif").addEventListener("change", e => {
     settings.browserNotif = e.target.checked; saveSettings();
-    if(e.target.checked && "Notification" in window && Notification.permission === "default"){
-      Notification.requestPermission();
+    if(e.target.checked && "Notification" in window && Notification.permission==="default") Notification.requestPermission();
+  });
+  $("#setting-refresh").addEventListener("change", e => { settings.refreshInterval = parseInt(e.target.value,10); saveSettings(); scheduleLiveRefresh(); });
+
+  $("#fd-token-input").addEventListener("change", e => {
+    settings.fdToken = e.target.value.trim(); saveSettings(); updateFdTokenStatus();
+    hotFdCompetitions = new Set();
+    loadedOnce.today=false; loadedOnce.tomorrow=false;
+    if(getActiveTab()==="today") loadFixturesForDay(0,"today-list","today-error-box","today-date-label"), loadedOnce.today=true;
+    if(getActiveTab()==="tomorrow") loadFixturesForDay(1,"tomorrow-list","tomorrow-error-box","tomorrow-date-label"), loadedOnce.tomorrow=true;
+    if(getActiveTab()==="live") loadLiveMatches(true);
+  });
+  $("#fd-token-help").addEventListener("click", () => {
+    window.open("https://www.football-data.org/client/register", "_blank", "noopener");
+  });
+  $("#fd-token-test").addEventListener("click", async () => {
+    const testBtn = $("#fd-token-test");
+    const original = testBtn.textContent;
+    testBtn.textContent = "Testando..."; testBtn.disabled = true;
+    try{
+      if(!settings.fdToken) throw new Error("Cole um token antes de testar.");
+      await fetchFD("/competitions/PL/matches", { dateFrom: dateStr(0), dateTo: dateStr(0) });
+      showToast("✓ Conexão com football-data.org funcionando!");
+    }catch(e){
+      showToast("✗ " + e.message);
+    }finally{
+      testBtn.textContent = original; testBtn.disabled = false;
     }
   });
-  $("#setting-refresh").addEventListener("change", e => {
-    settings.refreshInterval = parseInt(e.target.value, 10);
-    saveSettings(); scheduleLiveRefresh();
-  });
 
-  // Botões de atualizar
   $("#live-refresh-btn").addEventListener("click", () => loadLiveMatches(true));
-  $("#today-refresh-btn").addEventListener("click", () => loadFixturesForDay(0, "today-list", "today-error-box", "today-date-label"));
-  $("#tomorrow-refresh-btn").addEventListener("click", () => loadFixturesForDay(1, "tomorrow-list", "tomorrow-error-box", "tomorrow-date-label"));
+  $("#today-refresh-btn").addEventListener("click", () => loadFixturesForDay(0,"today-list","today-error-box","today-date-label"));
+  $("#tomorrow-refresh-btn").addEventListener("click", () => loadFixturesForDay(1,"tomorrow-list","tomorrow-error-box","tomorrow-date-label"));
 
-  // Busca
-  $("#today-search").addEventListener("input", () => filterList("today-list", "today-search"));
-  $("#tomorrow-search").addEventListener("input", () => filterList("tomorrow-list", "tomorrow-search"));
+  $("#today-search").addEventListener("input", () => filterList("today-list","today-search"));
+  $("#tomorrow-search").addEventListener("input", () => filterList("tomorrow-list","tomorrow-search"));
 
-  // Modal
   $("#modal-close").addEventListener("click", closeModal);
-  $("#modal-overlay").addEventListener("click", e => { if(e.target.id === "modal-overlay") closeModal(); });
-  document.addEventListener("keydown", e => { if(e.key === "Escape") closeModal(); });
+  $("#modal-overlay").addEventListener("click", e => { if(e.target.id==="modal-overlay") closeModal(); });
+  document.addEventListener("keydown", e => { if(e.key==="Escape") closeModal(); });
 
-  // Primeira carga
+  document.addEventListener("visibilitychange", () => { if(!document.hidden && getActiveTab()==="live") loadLiveMatches(false); });
+
+  setupPwa();
   activateTab("live");
   scheduleLiveRefresh();
 }
 
-function closeModal(){ $("#modal-overlay").classList.remove("open"); }
+function updateFdTokenStatus(){
+  const s = $("#fd-token-status");
+  if(settings.fdToken){ s.textContent="TOKEN ATIVO"; s.classList.remove("off"); s.classList.add("on"); }
+  else{ s.textContent="SEM TOKEN"; s.classList.remove("on"); s.classList.add("off"); }
+}
 
 document.addEventListener("DOMContentLoaded", init);
 })();
